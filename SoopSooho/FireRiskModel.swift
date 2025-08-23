@@ -11,13 +11,13 @@ import SwiftUICore
 struct FireRiskArea {
     let id = UUID()
     let name: String
-    let riskLevel: Int // 1-5 (5가 가장 위험)
+    let riskLevel: Int // 1-5 (5 = most dangerous)
     let temperature: Int
     let humidity: Int
     let windSpeed: Double
     let lastUpdated: Date
     
-    // 확장된 데이터 추가
+    // Extended data
     let enhancedData: EnhancedFireRiskArea
 }
 
@@ -29,17 +29,17 @@ class FireRiskViewModel: ObservableObject {
     }
     
     private func loadMockData() {
-        // 실제로는 API에서 받아올 데이터
+        // Normally this would come from an API
         topRiskAreas = [
             FireRiskArea(
-                name: "울진군 북면", 
-                riskLevel: 5, 
-                temperature: 32, 
-                humidity: 15, 
-                windSpeed: 8.5, 
+                name: "Buk-myeon, Uljin-gun",
+                riskLevel: 5,
+                temperature: 32,
+                humidity: 15,
+                windSpeed: 8.5,
                 lastUpdated: Date(),
                 enhancedData: EnhancedFireRiskArea(
-                    name: "울진군 북면",
+                    name: "Buk-myeon, Uljin-gun",
                     riskLevel: 5,
                     weatherData: WeatherData(
                         windDirection: .southwest,
@@ -52,13 +52,13 @@ class FireRiskViewModel: ObservableObject {
                     geographicData: GeographicData(
                         elevation: 450,
                         slope: 25.0,
-                        aspect: "남서",
+                        aspect: "Southwest",
                         vegetationType: .pine,
                         fuelLoad: 35.2
                     ),
                     soilData: SoilData(
                         moistureContent: 8.5,
-                        deepSoilMoisture: 5.2, // 심층 토양이 더 건조
+                        deepSoilMoisture: 5.2, // deeper soil is drier
                         organicMatter: 15.2,
                         soilType: .humus,
                         depth: 12.5,
@@ -66,7 +66,7 @@ class FireRiskViewModel: ObservableObject {
                             FireHistory(
                                 fireDate: Calendar.current.date(byAdding: .day, value: -15, to: Date()) ?? Date(),
                                 burnedArea: 2.3,
-                                suppressionDate: nil, // 미완전 진화
+                                suppressionDate: nil, // not fully extinguished
                                 fireIntensity: .high,
                                 location: FireLocation(latitude: 36.9, longitude: 129.4, radius: 0.5)
                             )
@@ -76,14 +76,14 @@ class FireRiskViewModel: ObservableObject {
                 )
             ),
             FireRiskArea(
-                name: "안동시 임하면", 
-                riskLevel: 4, 
-                temperature: 29, 
-                humidity: 22, 
-                windSpeed: 6.2, 
+                name: "Imha-myeon, Andong-si",
+                riskLevel: 4,
+                temperature: 29,
+                humidity: 22,
+                windSpeed: 6.2,
                 lastUpdated: Date(),
                 enhancedData: EnhancedFireRiskArea(
-                    name: "안동시 임하면",
+                    name: "Imha-myeon, Andong-si",
                     riskLevel: 4,
                     weatherData: WeatherData(
                         windDirection: .west,
@@ -96,7 +96,7 @@ class FireRiskViewModel: ObservableObject {
                     geographicData: GeographicData(
                         elevation: 320,
                         slope: 18.5,
-                        aspect: "서",
+                        aspect: "West",
                         vegetationType: .mixed,
                         fuelLoad: 28.7
                     ),
@@ -106,20 +106,20 @@ class FireRiskViewModel: ObservableObject {
                         organicMatter: 11.8,
                         soilType: .loam,
                         depth: 8.2,
-                        recentFireHistory: [] // 최근 화재 이력 없음
+                        recentFireHistory: [] // no recent fire history
                     ),
                     lastUpdated: Date()
                 )
             ),
             FireRiskArea(
-                name: "봉화군 춘양면", 
-                riskLevel: 3, 
-                temperature: 26, 
-                humidity: 35, 
-                windSpeed: 4.8, 
+                name: "Chunyang-myeon, Bonghwa-gun",
+                riskLevel: 3,
+                temperature: 26,
+                humidity: 35,
+                windSpeed: 4.8,
                 lastUpdated: Date(),
                 enhancedData: EnhancedFireRiskArea(
-                    name: "봉화군 춘양면",
+                    name: "Chunyang-myeon, Bonghwa-gun",
                     riskLevel: 3,
                     weatherData: WeatherData(
                         windDirection: .northwest,
@@ -132,7 +132,7 @@ class FireRiskViewModel: ObservableObject {
                     geographicData: GeographicData(
                         elevation: 580,
                         slope: 22.0,
-                        aspect: "북서",
+                        aspect: "Northwest",
                         vegetationType: .mixed,
                         fuelLoad: 28.3
                     ),
@@ -156,14 +156,14 @@ class FireRiskViewModel: ObservableObject {
                 )
             ),
             FireRiskArea(
-                name: "영덕군 영해면", 
-                riskLevel: 3, 
-                temperature: 28, 
-                humidity: 28, 
-                windSpeed: 5.8, 
+                name: "Yeonghae-myeon, Yeongdeok-gun",
+                riskLevel: 3,
+                temperature: 28,
+                humidity: 28,
+                windSpeed: 5.8,
                 lastUpdated: Date(),
                 enhancedData: EnhancedFireRiskArea(
-                    name: "영덕군 영해면",
+                    name: "Yeonghae-myeon, Yeongdeok-gun",
                     riskLevel: 3,
                     weatherData: WeatherData(
                         windDirection: .east,
@@ -176,7 +176,7 @@ class FireRiskViewModel: ObservableObject {
                     geographicData: GeographicData(
                         elevation: 180,
                         slope: 12.5,
-                        aspect: "동",
+                        aspect: "East",
                         vegetationType: .oak,
                         fuelLoad: 22.3
                     ),
@@ -186,20 +186,20 @@ class FireRiskViewModel: ObservableObject {
                         organicMatter: 8.9,
                         soilType: .clay,
                         depth: 5.4,
-                        recentFireHistory: [] // 최근 화재 이력 없음
+                        recentFireHistory: [] // no recent fire history
                     ),
                     lastUpdated: Date()
                 )
             ),
             FireRiskArea(
-                name: "청송군 진보면", 
-                riskLevel: 3, 
-                temperature: 27, 
-                humidity: 31, 
-                windSpeed: 4.9, 
+                name: "Jinbo-myeon, Cheongsong-gun",
+                riskLevel: 3,
+                temperature: 27,
+                humidity: 31,
+                windSpeed: 4.9,
                 lastUpdated: Date(),
                 enhancedData: EnhancedFireRiskArea(
-                    name: "청송군 진보면",
+                    name: "Jinbo-myeon, Cheongsong-gun",
                     riskLevel: 3,
                     weatherData: WeatherData(
                         windDirection: .south,
@@ -212,7 +212,7 @@ class FireRiskViewModel: ObservableObject {
                     geographicData: GeographicData(
                         elevation: 420,
                         slope: 22.0,
-                        aspect: "남",
+                        aspect: "South",
                         vegetationType: .shrub,
                         fuelLoad: 18.9
                     ),
@@ -222,7 +222,7 @@ class FireRiskViewModel: ObservableObject {
                         organicMatter: 6.7,
                         soilType: .sand,
                         depth: 4.2,
-                        recentFireHistory: [] // 최근 화재 이력 없음
+                        recentFireHistory: [] // no recent fire history
                     ),
                     lastUpdated: Date()
                 )
@@ -242,11 +242,11 @@ class FireRiskViewModel: ObservableObject {
     
     func getRiskLevelText(_ level: Int) -> String {
         switch level {
-        case 5: return "매우 위험"
-        case 4: return "위험"
-        case 3: return "보통"
-        case 2: return "낮음"
-        default: return "안전"
+        case 5: return "Very High"
+        case 4: return "High"
+        case 3: return "Moderate"
+        case 2: return "Low"
+        default: return "Safe"
         }
     }
 }

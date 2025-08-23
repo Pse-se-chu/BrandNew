@@ -8,20 +8,20 @@
 import Foundation
 import SwiftUI
 
-// 화재 이력 데이터 모델
+// Wildfire History Data Model
 struct FireHistory {
     let fireDate: Date
-    let burnedArea: Double // 연소 면적 (ha)
-    let suppressionDate: Date? // 진화 완료일 (nil이면 미완료)
+    let burnedArea: Double // Burned Area (ha)
+    let suppressionDate: Date? // Suppression Completion Date (nil = not suppressed)
     let fireIntensity: FireIntensity
     let location: FireLocation
 }
 
 enum FireIntensity: String, CaseIterable {
-    case low = "약함"
-    case moderate = "보통"
-    case high = "강함"
-    case extreme = "극강"
+    case low = "Low"
+    case moderate = "Moderate"
+    case high = "High"
+    case extreme = "Extreme"
     
     var riskMultiplier: Double {
         switch self {
@@ -36,24 +36,24 @@ enum FireIntensity: String, CaseIterable {
 struct FireLocation {
     let latitude: Double
     let longitude: Double
-    let radius: Double // 영향 반경 (km)
+    let radius: Double // Impact Radius (km)
 }
 
-// 지리 정보 모델
+// Geographic Data Model
 struct GeographicData {
-    let elevation: Int // 고도 (m)
-    let slope: Double // 경사도 (도)
-    let aspect: String // 사면 방향 (북, 남, 동, 서, 북동, 남동, 남서, 북서)
+    let elevation: Int // Elevation (m)
+    let slope: Double // Slope (°)
+    let aspect: String // Aspect (N, S, E, W, NE, SE, SW, NW)
     let vegetationType: VegetationType
-    let fuelLoad: Double // 연료량 (ton/ha)
+    let fuelLoad: Double // Fuel Load (ton/ha)
 }
 
 enum VegetationType: String, CaseIterable {
-    case pine = "소나무림"
-    case oak = "참나무림"
-    case mixed = "혼효림"
-    case grassland = "초지"
-    case shrub = "관목림"
+    case pine = "Pine Forest"
+    case oak = "Oak Forest"
+    case mixed = "Mixed Forest"
+    case grassland = "Grassland"
+    case shrub = "Shrubland"
     
     var flammability: Double {
         switch self {
@@ -76,74 +76,69 @@ enum VegetationType: String, CaseIterable {
     }
 }
 
-// 토양 데이터 모델
+// Soil Data Model
 struct SoilData {
-    let moistureContent: Double // 표면 토양 수분 함량 (%)
-    let deepSoilMoisture: Double // 심층 토양 수분 함량 (20-50cm 깊이, %)
-    let organicMatter: Double // 유기물 함량 (%)
+    let moistureContent: Double // Surface Soil Moisture (%)
+    let deepSoilMoisture: Double // Deep Soil Moisture (20–50 cm depth, %)
+    let organicMatter: Double // Organic Matter (%)
     let soilType: SoilType
-    let depth: Double // 유기물층 깊이 (cm)
-    let recentFireHistory: [FireHistory] // 최근 화재 이력
+    let depth: Double // Organic Layer Depth (cm)
+    let recentFireHistory: [FireHistory] // Recent Fire History
     
-    // ZFRI 계산 (Zombie Fire Risk Index)
+    // ZFRI Calculation (Zombie Fire Risk Index)
     var zfriScore: Double {
-        let deepSoilDeficit = 1.0 - (deepSoilMoisture / 100.0) // 심층 토양 건조도
-        let organicFactor = min(organicMatter / 100.0, 1.0) // 유기물 함량 비율 (최대 1.0)
-        let burnHistoryWeight = calculateBurnHistoryWeight() // 화재 이력 가중치
+        let deepSoilDeficit = 1.0 - (deepSoilMoisture / 100.0) // Deep Soil Dryness
+        let organicFactor = min(organicMatter / 100.0, 1.0) // Organic Matter Ratio
+        let burnHistoryWeight = calculateBurnHistoryWeight() // Fire History Weight
         
         return deepSoilDeficit * organicFactor * burnHistoryWeight
     }
     
-    // ZFRI 점수 기반 위험도 분류
+    // ZFRI Score → Risk Level
     var zfriRiskLevel: ZombieFireRisk {
         let score = zfriScore
         switch score {
-        case 0.8...: return .veryHigh    // 0.8 이상 = 매우 높음
-        case 0.6..<0.8: return .high     // 0.6~0.8 = 높음
-        case 0.4..<0.6: return .medium   // 0.4~0.6 = 보통
-        case 0.2..<0.4: return .low      // 0.2~0.4 = 낮음
-        default: return .veryLow         // 0.2 미만 = 매우 낮음
+        case 0.8...: return .veryHigh
+        case 0.6..<0.8: return .high
+        case 0.4..<0.6: return .medium
+        case 0.2..<0.4: return .low
+        default: return .veryLow
         }
     }
     
-    // 최근 화재 이력 가중치 계산
+    // Recent Fire History Weight
     private func calculateBurnHistoryWeight() -> Double {
         let currentDate = Date()
         let oneMonthAgo = Calendar.current.date(byAdding: .month, value: -1, to: currentDate) ?? currentDate
         
-        // 최근 1개월 내 화재 이력 필터링
         let recentFires = recentFireHistory.filter { fire in
             fire.fireDate >= oneMonthAgo
         }
         
         if recentFires.isEmpty {
-            return 1.0 // 기본 가중치
+            return 1.0
         }
         
-        // 화재 강도와 진화 여부에 따른 가중치 계산
         var totalWeight = 1.0
-        
         for fire in recentFires {
             let intensityMultiplier = fire.fireIntensity.riskMultiplier
-            let suppressionFactor = fire.suppressionDate == nil ? 2.0 : 1.3 // 미진화시 더 높은 가중치
-            
-            // 화재 발생일로부터 경과 시간 (최근일수록 높은 가중치)
+            let suppressionFactor = fire.suppressionDate == nil ? 2.0 : 1.3
             let daysSinceFire = Calendar.current.dateComponents([.day], from: fire.fireDate, to: currentDate).day ?? 30
-            let timeFactor = max(0.1, 1.0 - (Double(daysSinceFire) / 30.0)) // 30일에 걸쳐 감소
+            let timeFactor = max(0.1, 1.0 - (Double(daysSinceFire) / 30.0))
             
             totalWeight += (intensityMultiplier * suppressionFactor * timeFactor)
         }
         
-        return min(totalWeight, 5.0) // 최대 5배까지 가중
+        return min(totalWeight, 5.0)
     }
 }
 
 enum SoilType: String, CaseIterable {
-    case peat = "이탄토"
-    case humus = "부식토"
-    case clay = "점토"
-    case sand = "사질토"
-    case loam = "양토"
+    case peat = "Peat"
+    case humus = "Humus"
+    case clay = "Clay"
+    case sand = "Sand"
+    case loam = "Loam"
     
     var zombieFirePotential: Double {
         switch self {
@@ -157,11 +152,11 @@ enum SoilType: String, CaseIterable {
 }
 
 enum ZombieFireRisk: String, CaseIterable {
-    case veryHigh = "매우 높음"
-    case high = "높음"
-    case medium = "보통"
-    case low = "낮음"
-    case veryLow = "매우 낮음"
+    case veryHigh = "Very High"
+    case high = "High"
+    case medium = "Medium"
+    case low = "Low"
+    case veryLow = "Very Low"
     
     var color: Color {
         switch self {
@@ -184,66 +179,64 @@ enum ZombieFireRisk: String, CaseIterable {
     }
 }
 
-// 기상 데이터 모델
+// Weather Data Model
 struct WeatherData {
     let windDirection: WindDirection
     let windSpeed: Double
     let temperature: Int
     let humidity: Int
-    let precipitation: Double // 강수량 (mm)
-    let droughtIndex: Double // 가뭄 지수 (0-1)
+    let precipitation: Double // Precipitation (mm)
+    let droughtIndex: Double // Drought Index (0–1)
 }
 
 enum WindDirection: String, CaseIterable {
-    case north = "북"
-    case northeast = "북동"
-    case east = "동"
-    case southeast = "남동"
-    case south = "남"
-    case southwest = "남서"
-    case west = "서"
-    case northwest = "북서"
+    case north = "North"
+    case northeast = "Northeast"
+    case east = "East"
+    case southeast = "Southeast"
+    case south = "South"
+    case southwest = "Southwest"
+    case west = "West"
+    case northwest = "Northwest"
     
     var angle: Double {
-        // 화재 확산 방향 (바람이 부는 방향) - 화면 좌표계 기준
         switch self {
-        case .north: return 90     // 북풍 → 남쪽으로 확산 (아래쪽)
-        case .northeast: return 135 // 북동풍 → 남서쪽으로 확산
-        case .east: return 180     // 동풍 → 서쪽으로 확산 (왼쪽)
-        case .southeast: return 225 // 남동풍 → 북서쪽으로 확산
-        case .south: return 270    // 남풍 → 북쪽으로 확산 (위쪽)
-        case .southwest: return 315 // 남서풍 → 북동쪽으로 확산
-        case .west: return 0       // 서풍 → 동쪽으로 확산 (오른쪽)
-        case .northwest: return 45  // 북서풍 → 남동쪽으로 확산
+        case .north: return 90
+        case .northeast: return 135
+        case .east: return 180
+        case .southeast: return 225
+        case .south: return 270
+        case .southwest: return 315
+        case .west: return 0
+        case .northwest: return 45
         }
     }
     
     var symbol: String {
-        // 화재 확산 방향 화살표
         switch self {
-        case .north: return "↓"    // 북풍 → 남쪽(아래)으로 확산
-        case .northeast: return "↙" // 북동풍 → 남서쪽으로 확산
-        case .east: return "←"     // 동풍 → 서쪽(왼쪽)으로 확산
-        case .southeast: return "↖" // 남동풍 → 북서쪽으로 확산
-        case .south: return "↑"    // 남풍 → 북쪽(위)으로 확산
-        case .southwest: return "↗" // 남서풍 → 북동쪽으로 확산
-        case .west: return "→"     // 서풍 → 동쪽(오른쪽)으로 확산
-        case .northwest: return "↘" // 북서풍 → 남동쪽으로 확산
+        case .north: return "↓"
+        case .northeast: return "↙"
+        case .east: return "←"
+        case .southeast: return "↖"
+        case .south: return "↑"
+        case .southwest: return "↗"
+        case .west: return "→"
+        case .northwest: return "↘"
         }
     }
 }
 
-// 확산 예측 포인트
+// Spread Prediction Point
 struct SpreadPoint {
     let id = UUID()
     var x: Double
     var y: Double
-    var intensity: Double // 화재 강도 (0-1)
-    var arrivalTime: Double // 도달 시간 (분)
-    var isZombieFire: Bool // 좀비불 여부
+    var intensity: Double // Fire Intensity (0–1)
+    var arrivalTime: Double // Arrival Time (min)
+    var isZombieFire: Bool // Zombie Fire
 }
 
-// 확장된 산불 위험 지역 모델
+// Extended Fire Risk Area Model
 struct EnhancedFireRiskArea {
     let id = UUID()
     let name: String
@@ -253,13 +246,12 @@ struct EnhancedFireRiskArea {
     let soilData: SoilData
     let lastUpdated: Date
     
-    // 종합 위험도 계산
+    // Overall Risk Score
     var overallRiskScore: Double {
         let weatherRisk = calculateWeatherRisk()
         let geographicRisk = calculateGeographicRisk()
-        let soilRisk = soilData.zfriRiskLevel.riskValue // 계산된 ZFRI 위험도 사용
-        
-        return (weatherRisk * 0.4 + geographicRisk * 0.4 + soilRisk * 0.2)
+        let soilRisk = soilData.zfriRiskLevel.riskValue
+        return weatherRisk * 0.4 + geographicRisk * 0.4 + soilRisk * 0.2
     }
     
     func calculateWeatherRisk() -> Double {
@@ -267,7 +259,6 @@ struct EnhancedFireRiskArea {
         let humidityFactor = 1.0 - (Double(weatherData.humidity) / 100.0)
         let windFactor = min(weatherData.windSpeed / 15.0, 1.0)
         let droughtFactor = weatherData.droughtIndex
-        
         return (tempFactor + humidityFactor + windFactor + droughtFactor) / 4.0
     }
     
@@ -275,27 +266,26 @@ struct EnhancedFireRiskArea {
         let slopeFactor = min(geographicData.slope / 45.0, 1.0)
         let vegetationFactor = geographicData.vegetationType.flammability
         let fuelFactor = min(geographicData.fuelLoad / 50.0, 1.0)
-        
         return (slopeFactor + vegetationFactor + fuelFactor) / 3.0
     }
 }
 
-// 시뮬레이션 결과 모델
+// Simulation Result Model
 struct SimulationResult {
     let spreadPoints: [SpreadPoint]
-    let affectedArea: Double // 영향 면적 (ha)
-    let maxSpreadDistance: Double // 최대 확산 거리 (m)
+    let affectedArea: Double // Affected Area (ha)
+    let maxSpreadDistance: Double // Max Spread Distance (m)
     let zombieFireLocations: [SpreadPoint]
-    let estimatedDuration: Int // 예상 지속 시간 (시간)
+    let estimatedDuration: Int // Estimated Duration (hours)
     let suppressionDifficulty: SuppressionDifficulty
 }
 
 enum SuppressionDifficulty: String, CaseIterable {
-    case veryEasy = "매우 쉬움"
-    case easy = "쉬움"
-    case moderate = "보통"
-    case difficult = "어려움"
-    case veryDifficult = "매우 어려움"
+    case veryEasy = "Very Easy"
+    case easy = "Easy"
+    case moderate = "Moderate"
+    case difficult = "Difficult"
+    case veryDifficult = "Very Difficult"
     
     var color: Color {
         switch self {

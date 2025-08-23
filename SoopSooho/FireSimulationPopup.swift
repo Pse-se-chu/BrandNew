@@ -65,12 +65,12 @@ struct FireSimulationPopup: View {
                 let soilRisk = area.enhancedData.soilData.zfriRiskLevel.riskValue
                 let overallRisk = area.enhancedData.overallRiskScore
                 
-                print("=== 위험도 계산 ===")
+                print("=== Risk Calculation ===")
                 print("Weather Risk: \(weatherRisk)")
                 print("Geographic Risk: \(geographicRisk)")
                 print("Soil Risk: \(soilRisk)")
                 print("Overall Risk: \(overallRisk)")
-                print("==================")
+                print("========================")
                 
                 // 위험도 링 애니메이션 시작 (약간의 지연 후)
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -163,7 +163,7 @@ struct FireSimulationPopup: View {
         VStack(alignment: .leading, spacing: 16) {
             // 종합 위험도
             VStack(alignment: .leading, spacing: 12) {
-                Text("종합 위험도 지수")
+                Text("Overall Risk Index")
                     .font(.headline)
                     .fontWeight(.semibold)
                 
@@ -207,28 +207,28 @@ struct FireSimulationPopup: View {
                         HStack {
                             Image(systemName: "thermometer")
                                 .foregroundColor(.red)
-                            Text("온도: \(area.temperature)°C")
+                            Text("Temperature: \(area.temperature)°C")
                                 .font(.subheadline)
                         }
-                        
+                                                
                         HStack {
                             Image(systemName: "drop")
                                 .foregroundColor(.blue)
-                            Text("습도: \(area.humidity)%")
+                            Text("Humidity: \(area.humidity)%")
                                 .font(.subheadline)
                         }
-                        
+                                                
                         HStack {
                             Image(systemName: "wind")
                                 .foregroundColor(.gray)
-                            Text("풍속: \(String(format: "%.1f", area.windSpeed))m/s")
+                            Text("Wind Speed: \(String(format: "%.1f", area.windSpeed)) m/s")
                                 .font(.subheadline)
                         }
-                        
+                                                
                         HStack {
                             Image(systemName: "location")
                                 .foregroundColor(.green)
-                            Text("풍향: \(area.enhancedData.weatherData.windDirection.rawValue) \(area.enhancedData.weatherData.windDirection.symbol)")
+                            Text("Wind Direction: \(area.enhancedData.weatherData.windDirection.rawValue) \(area.enhancedData.weatherData.windDirection.symbol)")
                                 .font(.subheadline)
                         }
                     }
@@ -285,7 +285,7 @@ struct FireSimulationPopup: View {
         VStack(alignment: .leading, spacing: 16) {
             // 지형 정보
             VStack(alignment: .leading, spacing: 12) {
-                Text("지형 정보")
+                Text("Geographic Information")
                     .font(.headline)
                     .fontWeight(.semibold)
                 
@@ -452,9 +452,9 @@ struct FireSimulationPopup: View {
 
     private var simulationView: some View {
         VStack(alignment: .leading, spacing: 16) {
-            // 시뮬레이션 컨트롤
+            // Simulation Control
             HStack {
-                Text("산불 확산 시뮬레이션")
+                Text("Wildfire Spread Simulation")
                     .font(.headline)
                     .fontWeight(.semibold)
                 
@@ -465,7 +465,7 @@ struct FireSimulationPopup: View {
                 }) {
                     HStack {
                         Image(systemName: isSimulating ? "stop.circle" : "play.circle")
-                        Text(isSimulating ? "중지" : "시뮬레이션 시작")
+                        Text(isSimulating ? "Stop" : "Start Simulation")
                     }
                     .font(.subheadline)
                     .padding(.horizontal, 12)
@@ -476,9 +476,9 @@ struct FireSimulationPopup: View {
                 }
             }
             
-            // 시뮬레이션 맵 영역
+            // Simulation Map Area
             ZStack {
-                // 배경 지형
+                // Background Terrain
                 Rectangle()
                     .fill(
                         LinearGradient(
@@ -490,12 +490,12 @@ struct FireSimulationPopup: View {
                     .frame(height: 250)
                     .cornerRadius(12)
                 
-                // 풍향 표시
+                // Wind Direction
                 VStack {
                     HStack {
                         Spacer()
                         VStack {
-                            Text("풍향: \(area.enhancedData.weatherData.windDirection.rawValue)")
+                            Text("Wind Direction: \(area.enhancedData.weatherData.windDirection.rawValue)")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                             Text(area.enhancedData.weatherData.windDirection.symbol)
@@ -511,13 +511,13 @@ struct FireSimulationPopup: View {
                 .padding(12)
                 
                 if simulationProgress > 0 {
-                    // 발화 지점
+                    // Ignition Point
                     Circle()
                         .fill(Color.red)
                         .frame(width: 12, height: 12)
                         .position(x: 150, y: 125)
                     
-                    // 일반 산불 확산
+                    // Normal Fire Spread
                     ForEach(spreadPoints.indices, id: \.self) { index in
                         let point = spreadPoints[index]
                         Circle()
@@ -527,7 +527,7 @@ struct FireSimulationPopup: View {
                             .animation(.easeInOut(duration: 0.5), value: simulationProgress)
                     }
                     
-                    // 좀비불 지점
+                    // Zombie Fire Points
                     ForEach(zombieFirePoints.indices, id: \.self) { index in
                         let point = zombieFirePoints[index]
                         if point.isZombieFire {
@@ -551,10 +551,10 @@ struct FireSimulationPopup: View {
                         Image(systemName: "map.fill")
                             .font(.system(size: 40))
                             .foregroundColor(.gray)
-                        Text("시뮬레이션을 시작하세요")
+                        Text("Start the simulation")
                             .font(.subheadline)
                             .foregroundColor(.gray)
-                        Text("풍향, 지형, 토양 데이터를 기반으로 확산을 예측합니다")
+                        Text("Spread will be predicted based on wind, terrain, and soil data")
                             .font(.caption)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
@@ -562,11 +562,11 @@ struct FireSimulationPopup: View {
                 }
             }
             
-            // 시뮬레이션 진행 정보
+            // Simulation Progress Info
             if simulationProgress > 0 {
                 VStack(alignment: .leading, spacing: 12) {
                     HStack {
-                        Text("확산 진행률")
+                        Text("Spread Progress")
                             .font(.subheadline)
                         Spacer()
                         Text("\(Int(simulationProgress * 100))%")
@@ -578,10 +578,10 @@ struct FireSimulationPopup: View {
                         .progressViewStyle(LinearProgressViewStyle(tint: .red))
                     
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 8) {
-                        simulationInfoCard("예상 확산 시간", "\(Int(simulationProgress * 180))분", .orange)
-                        simulationInfoCard("영향 면적", String(format: "%.1fha", simulationProgress * 25.5), .red)
-                        simulationInfoCard("좀비불 지점", "\(zombieFirePoints.filter { $0.isZombieFire }.count)개소", .purple)
-                        simulationInfoCard("진화 난이도", getSuppressionDifficulty(), getSuppressionColor())
+                        simulationInfoCard("Estimated Spread Time", "\(Int(simulationProgress * 180)) min", .orange)
+                        simulationInfoCard("Affected Area", String(format: "%.1f ha", simulationProgress * 25.5), .red)
+                        simulationInfoCard("Zombie Fire Points", "\(zombieFirePoints.filter { $0.isZombieFire }.count) spots", .purple)
+                        simulationInfoCard("Suppression Difficulty", getSuppressionDifficulty(), getSuppressionColor())
                     }
                 }
                 .padding(12)
@@ -590,7 +590,7 @@ struct FireSimulationPopup: View {
             }
         }
     }
-    
+
     private func simulationInfoCard(_ title: String, _ value: String, _ color: Color) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
@@ -605,18 +605,20 @@ struct FireSimulationPopup: View {
         .background(Color.white)
         .cornerRadius(6)
     }
-    
+
+    // Suppression Difficulty Text
     private func getSuppressionDifficulty() -> String {
         let difficulty = simulationProgress * area.enhancedData.overallRiskScore
         switch difficulty {
-        case 0..<0.2: return "쉬움"
-        case 0.2..<0.4: return "보통"
-        case 0.4..<0.6: return "어려움"
-        case 0.6..<0.8: return "매우 어려움"
-        default: return "극도로 어려움"
+        case 0..<0.2: return "Easy"
+        case 0.2..<0.4: return "Moderate"
+        case 0.4..<0.6: return "Difficult"
+        case 0.6..<0.8: return "Very Difficult"
+        default: return "Extremely Difficult"
         }
     }
-    
+
+    // Suppression Difficulty Color
     private func getSuppressionColor() -> Color {
         let difficulty = simulationProgress * area.enhancedData.overallRiskScore
         switch difficulty {
@@ -701,7 +703,7 @@ struct FireSimulationPopup: View {
             (x: 120.0, y: 100.0), // 주 확산 지역 1
             (x: 180.0, y: 140.0), // 주 확산 지역 2
             (x: 200.0, y: 110.0), // 주 확산 지역 3
-            (x: 160.0, y: 170.0)  // 주 확산 지역 4
+            (x: 160.0, y: 170.0) // 주 확산 지역 4
         ]
         
         for i in 0..<zombieCount {
@@ -746,4 +748,3 @@ struct FireSimulationPopup: View {
         }
     }
 }
-
