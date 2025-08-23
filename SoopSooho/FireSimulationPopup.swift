@@ -248,10 +248,10 @@ struct FireSimulationPopup: View {
                     .fontWeight(.semibold)
                 
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 12) {
-                    riskFactorCard("기상 조건", value: area.enhancedData.calculateWeatherRisk() * 100, color: .orange)
-                    riskFactorCard("지형 조건", value: area.enhancedData.calculateGeographicRisk() * 100, color: .green)
-                    riskFactorCard("토양 조건", value: area.enhancedData.soilData.zfriRiskLevel.riskValue * 100, color: .brown)
-                    riskFactorCard("가뭄 지수", value: area.enhancedData.weatherData.droughtIndex * 100, color: .red)
+                    riskFactorCard("Weather Conditions", value: area.enhancedData.calculateWeatherRisk() * 100, color: .orange)
+                    riskFactorCard("Geographic Conditions", value: area.enhancedData.calculateGeographicRisk() * 100, color: .green)
+                    riskFactorCard("Soil Conditions", value: area.enhancedData.soilData.zfriRiskLevel.riskValue * 100, color: .brown)
+                    riskFactorCard("Drought Index", value: area.enhancedData.weatherData.droughtIndex * 100, color: .red)
                 }
             }
         }
