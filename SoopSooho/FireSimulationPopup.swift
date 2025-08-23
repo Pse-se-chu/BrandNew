@@ -83,13 +83,14 @@ struct FireSimulationPopup: View {
     }
 
     // MARK: - Header View
+
     private var headerView: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 Text(area.name)
                     .font(.title2)
                     .fontWeight(.bold)
-                Text("산불 위험도 분석 및 확산 시뮬레이션")
+                Text("Wildfire Risk Analysis & Spread Simulation")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
@@ -110,6 +111,7 @@ struct FireSimulationPopup: View {
     }
     
     // MARK: - Tab Selection View
+
     private var tabSelectionView: some View {
         HStack(spacing: 0) {
             ForEach(0..<3) { index in
@@ -148,14 +150,15 @@ struct FireSimulationPopup: View {
     
     private func getTabTitle(_ index: Int) -> String {
         switch index {
-        case 0: return "위험도 지수"
-        case 1: return "환경 데이터"
-        case 2: return "확산 시뮬레이션"
+        case 0: return "Risk Index"
+        case 1: return "Environmental Data"
+        case 2: return "Spread Simulation"
         default: return ""
         }
     }
     
     // MARK: - Current Risk View
+
     private var currentRiskView: some View {
         VStack(alignment: .leading, spacing: 16) {
             // 종합 위험도
@@ -234,12 +237,13 @@ struct FireSimulationPopup: View {
                 }
             }
             .padding(16)
-            .background(Color.gray.opacity(0.1))
+//            .background(Color.gray.opacity(0.1))
+            .background(Color(hex: "E0E9C9"))
             .cornerRadius(12)
             
             // 위험 요소 분석
             VStack(alignment: .leading, spacing: 12) {
-                Text("위험 요소 분석")
+                Text("Risk Factor Analysis")
                     .font(.headline)
                     .fontWeight(.semibold)
                 
@@ -276,6 +280,7 @@ struct FireSimulationPopup: View {
     }
     
     // MARK: - Environmental Data View
+
     private var environmentalDataView: some View {
         VStack(alignment: .leading, spacing: 16) {
             // 지형 정보
@@ -285,10 +290,10 @@ struct FireSimulationPopup: View {
                     .fontWeight(.semibold)
                 
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 12) {
-                    environmentDataCard("고도", "\(area.enhancedData.geographicData.elevation)m", "mountain.2")
-                    environmentDataCard("경사도", String(format: "%.1f°", area.enhancedData.geographicData.slope), "triangle")
-                    environmentDataCard("사면 방향", area.enhancedData.geographicData.aspect, "location.north")
-                    environmentDataCard("식생 유형", area.enhancedData.geographicData.vegetationType.rawValue, "leaf")
+                    environmentDataCard("Elevation", "\(area.enhancedData.geographicData.elevation)m", "mountain.2")
+                    environmentDataCard("Slope", String(format: "%.1f°", area.enhancedData.geographicData.slope), "triangle")
+                    environmentDataCard("Aspect", area.enhancedData.geographicData.aspect, "location.north")
+                    environmentDataCard("Vegetation", area.enhancedData.geographicData.vegetationType.rawValue, "leaf")
                 }
             }
             .padding(16)
@@ -304,26 +309,26 @@ struct FireSimulationPopup: View {
                 VStack(spacing: 12) {
                     HStack {
                         VStack(alignment: .leading, spacing: 8) {
-                            environmentDataCard("표면 토양수분", String(format: "%.1f%%", area.enhancedData.soilData.moistureContent), "drop")
-                            environmentDataCard("심층 토양수분", String(format: "%.1f%%", area.enhancedData.soilData.deepSoilMoisture), "drop.fill")
+                            environmentDataCard("Surface Soil Moisture", String(format: "%.1f%%", area.enhancedData.soilData.moistureContent), "drop")
+                            environmentDataCard("Deep Soil Moisture", String(format: "%.1f%%", area.enhancedData.soilData.deepSoilMoisture), "drop.fill")
                         }
-                        
+                                
                         VStack(alignment: .leading, spacing: 8) {
-                            environmentDataCard("유기물 함량", String(format: "%.1f%%", area.enhancedData.soilData.organicMatter), "leaf.circle")
-                            environmentDataCard("유기물층 깊이", String(format: "%.1fcm", area.enhancedData.soilData.depth), "ruler")
+                            environmentDataCard("Organic Matter", String(format: "%.1f%%", area.enhancedData.soilData.organicMatter), "leaf.circle")
+                            environmentDataCard("Organic Layer Depth", String(format: "%.1fcm", area.enhancedData.soilData.depth), "ruler")
                         }
                     }
-                    
+                            
                     HStack {
                         VStack(alignment: .leading, spacing: 8) {
-                            environmentDataCard("토양 유형", area.enhancedData.soilData.soilType.rawValue, "globe.asia.australia")
+                            environmentDataCard("Soil Type", area.enhancedData.soilData.soilType.rawValue, "globe.asia.australia")
                         }
-                        
+                                
                         VStack(alignment: .leading, spacing: 8) {
                             if !area.enhancedData.soilData.recentFireHistory.isEmpty {
-                                environmentDataCard("최근 화재", "\(area.enhancedData.soilData.recentFireHistory.count)건", "flame.fill")
+                                environmentDataCard("Recent Fires", "\(area.enhancedData.soilData.recentFireHistory.count)", "flame.fill")
                             } else {
-                                environmentDataCard("최근 화재", "없음", "checkmark.circle")
+                                environmentDataCard("Recent Fires", "None", "checkmark.circle")
                             }
                         }
                     }
@@ -332,7 +337,7 @@ struct FireSimulationPopup: View {
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
                             VStack(alignment: .leading, spacing: 4) {
-                                Text("좀비불 위험도 (ZFRI)")
+                                Text("Zombie Fire Risk (ZFRI)")
                                     .font(.subheadline)
                                     .fontWeight(.medium)
                                 Text(area.enhancedData.soilData.zfriRiskLevel.rawValue)
@@ -444,6 +449,7 @@ struct FireSimulationPopup: View {
     }
     
     // MARK: - Simulation View
+
     private var simulationView: some View {
         VStack(alignment: .leading, spacing: 16) {
             // 시뮬레이션 컨트롤
@@ -623,6 +629,7 @@ struct FireSimulationPopup: View {
     }
     
     // MARK: - Simulation Logic
+
     private func startSimulation() {
         if isSimulating {
             isSimulating = false
@@ -740,6 +747,7 @@ struct FireSimulationPopup: View {
     }
 }
 
+<<<<<<< HEAD
 //#Preview {
 //    FireSimulationPopup(
 //        area: FireRiskArea(
@@ -748,6 +756,16 @@ struct FireSimulationPopup: View {
 //            temperature: 32, 
 //            humidity: 15, 
 //            windSpeed: 8.5, 
+=======
+// #Preview {
+//    FireSimulationPopup(
+//        area: FireRiskArea(
+//            name: "울진군 북면",
+//            riskLevel: 5,
+//            temperature: 32,
+//            humidity: 15,
+//            windSpeed: 8.5,
+>>>>>>> d137af3f233290b93d31611ebe31d436ce39ccc4
 //            lastUpdated: Date(),
 //            enhancedData: EnhancedFireRiskArea(
 //                name: "울진군 북면",
