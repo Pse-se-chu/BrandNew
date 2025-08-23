@@ -302,7 +302,7 @@ struct FireSimulationPopup: View {
             
             // 토양 정보 및 좀비불 위험도
             VStack(alignment: .leading, spacing: 12) {
-                Text("토양 정보 & 좀비불 위험도")
+                Text("Soil Information & Zombie Fire Risk")
                     .font(.headline)
                     .fontWeight(.semibold)
                 
@@ -333,7 +333,7 @@ struct FireSimulationPopup: View {
                         }
                     }
                     
-                    // 좀비불 위험도 특별 표시
+                    // Special Display: Zombie Fire Risk
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
                             VStack(alignment: .leading, spacing: 4) {
@@ -371,24 +371,24 @@ struct FireSimulationPopup: View {
                             }
                         }
                         
-                        // ZFRI 구성 요소 표시
+                        // ZFRI Components
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("ZFRI 구성 요소:")
+                            Text("ZFRI Components:")
                                 .font(.caption)
                                 .fontWeight(.medium)
                             HStack {
-                                Text("• 심층토양건조도: \(String(format: "%.2f", 1.0 - (area.enhancedData.soilData.deepSoilMoisture / 100.0)))")
+                                Text("• Deep Soil Dryness: \(String(format: "%.2f", 1.0 - (area.enhancedData.soilData.deepSoilMoisture / 100.0)))")
                                     .font(.caption2)
                                 Spacer()
                             }
                             HStack {
-                                Text("• 유기물함량: \(String(format: "%.1f%%", area.enhancedData.soilData.organicMatter))")
+                                Text("• Organic Matter: \(String(format: "%.1f%%", area.enhancedData.soilData.organicMatter))")
                                     .font(.caption2)
                                 Spacer()
                             }
                             if !area.enhancedData.soilData.recentFireHistory.isEmpty {
                                 HStack {
-                                    Text("• 최근화재이력: \(area.enhancedData.soilData.recentFireHistory.count)건")
+                                    Text("• Recent Fire History: \(area.enhancedData.soilData.recentFireHistory.count) case(s)")
                                         .font(.caption2)
                                         .foregroundColor(.red)
                                     Spacer()
@@ -404,18 +404,18 @@ struct FireSimulationPopup: View {
             .padding(16)
             .background(Color.brown.opacity(0.1))
             .cornerRadius(12)
-            
-            // 기상 상세 정보
+
+            // Weather Details
             VStack(alignment: .leading, spacing: 12) {
-                Text("기상 상세 정보")
+                Text("Weather Details")
                     .font(.headline)
                     .fontWeight(.semibold)
                 
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 12) {
-                    environmentDataCard("강수량", String(format: "%.1fmm", area.enhancedData.weatherData.precipitation), "cloud.rain")
-                    environmentDataCard("가뭄 지수", String(format: "%.1f%%", area.enhancedData.weatherData.droughtIndex * 100), "sun.max")
-                    environmentDataCard("연료량", String(format: "%.1fton/ha", area.enhancedData.geographicData.fuelLoad), "tree")
-                    environmentDataCard("가연성", String(format: "%.0f%%", area.enhancedData.geographicData.vegetationType.flammability * 100), "flame")
+                    environmentDataCard("Precipitation", String(format: "%.1fmm", area.enhancedData.weatherData.precipitation), "cloud.rain")
+                    environmentDataCard("Drought Index", String(format: "%.1f%%", area.enhancedData.weatherData.droughtIndex * 100), "sun.max")
+                    environmentDataCard("Fuel Load", String(format: "%.1fton/ha", area.enhancedData.geographicData.fuelLoad), "tree")
+                    environmentDataCard("Flammability", String(format: "%.0f%%", area.enhancedData.geographicData.vegetationType.flammability * 100), "flame")
                 }
             }
             .padding(16)
