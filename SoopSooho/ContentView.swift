@@ -24,9 +24,9 @@ struct ContentView: View {
                     .foregroundStyle(Color.gray)
                     .padding(.bottom, 24)
                 
-                HStack(spacing: 35){
+                HStack(spacing: 35) {
                     // Realtime Top 5 Risk Areas
-                    ZStack{
+                    ZStack {
                         Rectangle()
                             .frame(width: 281, height: 654)
                             .cornerRadius(16)
@@ -37,7 +37,6 @@ struct ContentView: View {
                             // Header
                             VStack(alignment: .leading, spacing: 8) {
                                 HStack {
-                                   
                                     Text("Realtime Risk Areas")
                                         .font(.title3)
                                         .fontWeight(.bold)
@@ -60,8 +59,8 @@ struct ContentView: View {
                                 LazyVStack(spacing: 16) {
                                     ForEach(Array(viewModel.topRiskAreas.enumerated()), id: \.element.id) { index, area in
                                         FireRiskCard(
-                                            area: area, 
-                                            rank: index + 1, 
+                                            area: area,
+                                            rank: index + 1,
                                             viewModel: viewModel,
                                             onTap: {
                                                 selectedArea = area
@@ -75,6 +74,32 @@ struct ContentView: View {
                             }
                             
                             Spacer(minLength: 0)
+                            
+                            HStack {
+                                Spacer()
+                                VStack {
+                                    Text("Check live risk levels")
+                                        .font(.footnote)
+                                        .multilineTextAlignment(.center)
+                                    
+                                    Text("and be ready.")
+                                        .font(.footnote)
+                                        .multilineTextAlignment(.center)
+                                    
+                                    Text("@BrandNew")
+                                        .font(.caption2)
+                                        .fontWeight(.thin)
+                                        .multilineTextAlignment(.center)
+                                        .padding(.top, 4.0)
+                                }
+                                .padding(.trailing, 12)
+                                
+                                Image("Gom1")
+                                    .resizable()
+                                    .frame(width: 80, height: 120)
+                                    .aspectRatio(contentMode: .fit)
+                                    .padding(.trailing, 16)
+                            }
                         }
                         .frame(width: 281, height: 654)
                     }
@@ -83,7 +108,7 @@ struct ContentView: View {
                         .frame(width: 830, height: 654)
                         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                     
-                } .padding(.bottom, 27)
+                }.padding(.bottom, 27)
                
             }.padding(.top, 24)
             
@@ -134,7 +159,6 @@ struct FireRiskCard: View {
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundColor(.primary)
                         .lineLimit(1)
-
                 }
                 
                 Spacer()

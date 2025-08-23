@@ -182,21 +182,11 @@ struct GoogleMapView: UIViewRepresentable {
             updateHeatmapRadius(for: mapView.camera.zoom)
         }
 
-//        func mapView(_ mapView: GMSMapView, didChange position: GMSCameraPosition) {
-//            print("[Map] didChange zoom=\(position.zoom), center=(\(position.target.latitude), \(position.target.longitude))")
-//            updateHeatmapRadius(for: position.zoom)
-//        }
-//
-//        func mapView(_ mapView: GMSMapView, idleAt position: GMSCameraPosition) {
-//            print("[Map] idle    zoom=\(position.zoom), center=(\(position.target.latitude), \(position.target.longitude))")
-//            updateHeatmapRadius(for: position.zoom)
-//        }
-
         private func updateHeatmapRadius(for zoom: Float) {
             guard let heatmap = heatmap else { return }
             let useLarge = zoom > 9.5
             if useLarge != lastAppliedLarge {
-                heatmap.radius = useLarge ? 900 : 300
+                heatmap.radius = useLarge ? 600 : 300
                 heatmap.clearTileCache()
                 lastAppliedLarge = useLarge
                 print("[Heatmap] radius=\(heatmap.radius) (zoom=\(zoom))")

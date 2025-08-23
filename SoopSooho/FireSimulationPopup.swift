@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CoreLocation
 
 struct FireSimulationPopup: View {
     let area: FireRiskArea
@@ -19,6 +20,26 @@ struct FireSimulationPopup: View {
     
     // FireRiskViewModel 인스턴스 생성
     private let viewModel = FireRiskViewModel()
+    
+    private var mapCenter: CLLocationCoordinate2D {
+        if let loc = area.enhancedData.soilData.recentFireHistory.first?.location {
+            return CLLocationCoordinate2D(latitude: loc.latitude, longitude: loc.longitude)
+        }
+        switch area.name {
+        case "Buk-myeon, Uljin-gun":
+            return CLLocationCoordinate2D(latitude: 36.993, longitude: 129.409)
+        case "Imha-myeon, Andong-si":
+            return CLLocationCoordinate2D(latitude: 36.568, longitude: 128.729)
+        case "Chunyang-myeon, Bonghwa-gun":
+            return CLLocationCoordinate2D(latitude: 36.885, longitude: 128.915)
+        case "Yeonghae-myeon, Yeongdeok-gun":
+            return CLLocationCoordinate2D(latitude: 36.413, longitude: 129.057)
+        case "Jinbo-myeon, Cheongsong-gun":
+            return CLLocationCoordinate2D(latitude: 36.436, longitude: 129.057)
+        default:
+            return CLLocationCoordinate2D(latitude: 36.568, longitude: 128.729)
+        }
+    }
     
     var body: some View {
         ZStack {
@@ -478,17 +499,15 @@ struct FireSimulationPopup: View {
             
             // Simulation Map Area
             ZStack {
-                // Background Terrain
-                Rectangle()
-                    .fill(
-                        LinearGradient(
-                            colors: [Color.green.opacity(0.3), Color.brown.opacity(0.2)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(height: 250)
-                    .cornerRadius(12)
+                // Background Map
+                MapView(
+                    center: mapCenter,
+                    zoom: 12,
+                    isGestureEnabled: false,
+                    simulate: isSimulating
+                )
+                .frame(height: 250)
+                .cornerRadius(12)
                 
                 // Wind Direction
                 VStack {
