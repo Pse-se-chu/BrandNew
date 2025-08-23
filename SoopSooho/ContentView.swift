@@ -78,9 +78,9 @@ struct ContentView: View {
                         .frame(width: 281, height: 654)
                     }
                     
-                    Rectangle()
+                    GoogleMapView()
                         .frame(width: 830, height: 654)
-                        .cornerRadius(16)
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                     
                 } .padding(.bottom, 27)
                

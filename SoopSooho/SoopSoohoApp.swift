@@ -9,6 +9,9 @@ import SwiftUI
 
 @main
 struct SoopSoohoApp: App {
+    // AppDelegate 연결
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
     var body: some Scene {
         WindowGroup {
             ContentView()

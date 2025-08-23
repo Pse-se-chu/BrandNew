@@ -6,8 +6,15 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		D58061AA42C8530D8B064AFE /* Pods_SoopSooho.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 719E5EE0AA084C96A79AD94F /* Pods_SoopSooho.framework */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		0A33FDE62E58C362006D0402 /* SoopSooho.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SoopSooho.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2DDBC4561C60690A65CF3A5D /* Pods-SoopSooho.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SoopSooho.release.xcconfig"; path = "Target Support Files/Pods-SoopSooho/Pods-SoopSooho.release.xcconfig"; sourceTree = "<group>"; };
+		719E5EE0AA084C96A79AD94F /* Pods_SoopSooho.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SoopSooho.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		7DDF26CAF9CB03FB7AFB0F5C /* Pods-SoopSooho.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SoopSooho.debug.xcconfig"; path = "Target Support Files/Pods-SoopSooho/Pods-SoopSooho.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -23,6 +30,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D58061AA42C8530D8B064AFE /* Pods_SoopSooho.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -34,6 +42,8 @@
 			children = (
 				0A33FDE82E58C362006D0402 /* SoopSooho */,
 				0A33FDE72E58C362006D0402 /* Products */,
+				CEAE3BD6AB370C8FF2FC93AA /* Pods */,
+				6940A9AA793F3490355E88C6 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -45,6 +55,23 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		6940A9AA793F3490355E88C6 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				719E5EE0AA084C96A79AD94F /* Pods_SoopSooho.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		CEAE3BD6AB370C8FF2FC93AA /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				7DDF26CAF9CB03FB7AFB0F5C /* Pods-SoopSooho.debug.xcconfig */,
+				2DDBC4561C60690A65CF3A5D /* Pods-SoopSooho.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -52,9 +79,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0A33FDF12E58C364006D0402 /* Build configuration list for PBXNativeTarget "SoopSooho" */;
 			buildPhases = (
+				A0339191CD9BB982DD169720 /* [CP] Check Pods Manifest.lock */,
 				0A33FDE22E58C362006D0402 /* Sources */,
 				0A33FDE32E58C362006D0402 /* Frameworks */,
 				0A33FDE42E58C362006D0402 /* Resources */,
+				CFD17173C63C3D0418416651 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -64,8 +93,6 @@
 				0A33FDE82E58C362006D0402 /* SoopSooho */,
 			);
 			name = SoopSooho;
-			packageProductDependencies = (
-			);
 			productName = SoopSooho;
 			productReference = 0A33FDE62E58C362006D0402 /* SoopSooho.app */;
 			productType = "com.apple.product-type.application";
@@ -113,6 +140,52 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		A0339191CD9BB982DD169720 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-SoopSooho-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		CFD17173C63C3D0418416651 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-SoopSooho/Pods-SoopSooho-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-SoopSooho/Pods-SoopSooho-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SoopSooho/Pods-SoopSooho-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		0A33FDE22E58C362006D0402 /* Sources */ = {
@@ -162,7 +235,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -225,7 +298,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -246,6 +319,7 @@
 		};
 		0A33FDF22E58C364006D0402 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7DDF26CAF9CB03FB7AFB0F5C /* Pods-SoopSooho.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -273,6 +347,7 @@
 		};
 		0A33FDF32E58C364006D0402 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2DDBC4561C60690A65CF3A5D /* Pods-SoopSooho.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;

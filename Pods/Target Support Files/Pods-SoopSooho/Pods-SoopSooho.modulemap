@@ -1,0 +1,6 @@
+framework module Pods_SoopSooho {
+  umbrella header "Pods-SoopSooho-umbrella.h"
+
+  export *
+  module * { export * }
+}
