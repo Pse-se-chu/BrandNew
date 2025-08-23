@@ -1,7 +1,7 @@
 # BrandNew
 2025 Junction Asia
 
-# Wildfire Risk & Simulation Platform  
+# Soop Soo Ho
 **산불 위험도 예측과 확산 시뮬레이션을 통합한 산불 대응 솔루션**  
 
 ---
