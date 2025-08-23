@@ -329,7 +329,7 @@ struct FireSimulationPopup: View {
                                     .frame(width: 60, height: 60)
                                 
                                 Circle()
-                                    .trim(from: 0, to: min(area.enhancedData.soilData.zfriScore, 1.0))
+                                    .trim(from: 0, to: min(area.enhancedData.soilData.zombieFireRisk.riskValue, 1.0))
                                     .stroke(
                                         area.enhancedData.soilData.zombieFireRisk.color,
                                         style: StrokeStyle(lineWidth: 6, lineCap: .round)
@@ -647,24 +647,35 @@ struct FireSimulationPopup: View {
             ))
         }
         
-        // 좀비불 지점들 생성 (ZFRI 기반)
+        // 좀비불 지점들 생성 (ZFRI 기반, 산불 확산 지역 내에서 생성)
         let zfriScore = area.enhancedData.soilData.zfriScore
-        let zombieCount = Int(min(zfriScore * 8, 6)) // ZFRI 점수에 따라 최대 6개
+        let zombieCount = Int(min(zfriScore * 6, 4)) // ZFRI 점수에 따라 최대 4개로 조정
+        
+        // 산불 확산 지역의 중심점들을 기준으로 좀비불 위치 결정
+        let fireSpreadCenters = [
+            (x: 120.0, y: 100.0), // 주 확산 지역 1
+            (x: 180.0, y: 140.0), // 주 확산 지역 2
+            (x: 200.0, y: 110.0), // 주 확산 지역 3
+            (x: 160.0, y: 170.0)  // 주 확산 지역 4
+        ]
         
         for i in 0..<zombieCount {
-            let angle = Double.random(in: 0...(2 * .pi))
-            // ZFRI가 높을수록 더 넓은 범위에 분포
-            let distance = Double.random(in: 30...(100 + zfriScore * 50))
+            let centerIndex = i % fireSpreadCenters.count
+            let center = fireSpreadCenters[centerIndex]
             
-            let x = 150 + cos(angle) * distance
-            let y = 125 + sin(angle) * distance
+            // 확산 지역 중심에서 가까운 거리에 좀비불 생성
+            let angle = Double.random(in: 0...(2 * .pi))
+            let distance = Double.random(in: 15...(40 + zfriScore * 20)) // 더 가까운 거리
+            
+            let x = center.x + cos(angle) * distance
+            let y = center.y + sin(angle) * distance
             
             zombieFirePoints.append(SpreadPoint(
                 x: max(20, min(280, x)),
                 y: max(20, min(230, y)),
                 intensity: 0.0,
-                // ZFRI가 높을수록 더 빨리 발생
-                arrivalTime: Double(i) * 12 + max(30, 90 - zfriScore * 60),
+                // ZFRI가 높을수록 더 빨리 발생하지만 산불 확산 후에 나타남
+                arrivalTime: Double(i) * 15 + max(60, 120 - zfriScore * 40),
                 isZombieFire: true
             ))
         }

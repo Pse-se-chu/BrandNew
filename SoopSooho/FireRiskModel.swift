@@ -114,36 +114,36 @@ class FireRiskViewModel: ObservableObject {
             ),
             FireRiskArea(
                 name: "봉화군 춘양면", 
-                riskLevel: 4, 
-                temperature: 31, 
-                humidity: 18, 
-                windSpeed: 7.1, 
+                riskLevel: 3, 
+                temperature: 26, 
+                humidity: 35, 
+                windSpeed: 4.8, 
                 lastUpdated: Date(),
                 enhancedData: EnhancedFireRiskArea(
                     name: "봉화군 춘양면",
-                    riskLevel: 4,
+                    riskLevel: 3,
                     weatherData: WeatherData(
                         windDirection: .northwest,
-                        windSpeed: 7.1,
-                        temperature: 31,
-                        humidity: 18,
-                        precipitation: 0.2,
-                        droughtIndex: 0.78
+                        windSpeed: 4.8,
+                        temperature: 26,
+                        humidity: 35,
+                        precipitation: 1.5,
+                        droughtIndex: 0.45
                     ),
                     geographicData: GeographicData(
                         elevation: 580,
-                        slope: 32.0,
+                        slope: 22.0,
                         aspect: "북서",
-                        vegetationType: .pine,
-                        fuelLoad: 42.1
+                        vegetationType: .mixed,
+                        fuelLoad: 28.3
                     ),
                     soilData: SoilData(
-                        moistureContent: 9.8,
-                        deepSoilMoisture: 6.1, // 이탄토라 심층도 매우 건조
-                        organicMatter: 18.5,
-                        soilType: .peat,
-                        depth: 15.7,
-                        zombieFireRisk: .veryHigh,
+                        moistureContent: 18.2,
+                        deepSoilMoisture: 14.8,
+                        organicMatter: 12.1,
+                        soilType: .loam,
+                        depth: 8.5,
+                        zombieFireRisk: .medium,
                         recentFireHistory: [
                             FireHistory(
                                 fireDate: Calendar.current.date(byAdding: .day, value: -8, to: Date()) ?? Date(),
