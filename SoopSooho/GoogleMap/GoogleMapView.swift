@@ -116,19 +116,38 @@ struct GoogleMapView: UIViewRepresentable {
         private var lastAppliedLarge: Bool = false
         
         func mapView(_ mapView: GMSMapView, didTapAt coordinate: CLLocationCoordinate2D) {
-            print("[GoogleMap] 맵 터치: \(coordinate)")
+            print("🔥 [GoogleMap] 맵 터치됨! 좌표: \(coordinate.latitude), \(coordinate.longitude)")
             
             // 터치한 좌표와 가장 가까운 위험 지역 찾기
             if let nearestArea = findNearestRiskArea(to: coordinate) {
-                print("[GoogleMap] 가장 가까운 지역: \(nearestArea.name)")
+                print("✅ [GoogleMap] 가장 가까운 지역 찾음: \(nearestArea.name)")
                 
                 // Notification으로 ContentView에 전달
                 DispatchQueue.main.async {
-                    print("[GoogleMap] Notification 발송: \(nearestArea.name)")
+                    print("📡 [GoogleMap] Notification 발송 중: \(nearestArea.name)")
                     NotificationCenter.default.post(
                         name: NSNotification.Name("ShowFireRiskPopup"),
                         object: nearestArea
                     )
+                }
+            } else {
+                print("❌ [GoogleMap] 근처에 위험 지역 없음. 터치 좌표: \(coordinate)")
+                
+                // 디버깅: 모든 히트맵 포인트와의 거리 출력
+                let heatmapPoints = [
+                    (lat: 36.993, lng: 129.409, name: "Buk-myeon, Uljin-gun"),
+                    (lat: 36.568, lng: 128.729, name: "Imha-myeon, Andong-si"),
+                    (lat: 36.885, lng: 128.915, name: "Chunyang-myeon, Bonghwa-gun"),
+                    (lat: 36.416, lng: 129.365, name: "Yeonghae-myeon, Yeongdeok-gun"),
+                    (lat: 36.436, lng: 129.057, name: "Jinbo-myeon, Cheongsong-gun")
+                ]
+                
+                for point in heatmapPoints {
+                    let distance = calculateDistance(
+                        from: coordinate,
+                        to: CLLocationCoordinate2D(latitude: point.lat, longitude: point.lng)
+                    )
+                    print("📍 \(point.name): 거리 \(String(format: "%.3f", distance))도")
                 }
             }
         }
@@ -140,11 +159,11 @@ struct GoogleMapView: UIViewRepresentable {
             
             // 히트맵 데이터 포인트들과 비교
             let heatmapPoints = [
-                (lat: 36.993, lng: 129.409, name: "울진군 북면"),
-                (lat: 36.568, lng: 128.729, name: "안동시 임하면"),
-                (lat: 36.885, lng: 128.915, name: "봉화군 춘양면"),
-                (lat: 36.416, lng: 129.365, name: "영덕군 영해면"),
-                (lat: 36.436, lng: 129.057, name: "청송군 진보면")
+                (lat: 36.993, lng: 129.409, name: "Buk-myeon, Uljin-gun"),
+                (lat: 36.568, lng: 128.729, name: "Imha-myeon, Andong-si"),
+                (lat: 36.885, lng: 128.915, name: "Chunyang-myeon, Bonghwa-gun"),
+                (lat: 36.416, lng: 129.365, name: "Yeonghae-myeon, Yeongdeok-gun"),
+                (lat: 36.436, lng: 129.057, name: "Jinbo-myeon, Cheongsong-gun")
             ]
             
             for point in heatmapPoints {
@@ -154,7 +173,7 @@ struct GoogleMapView: UIViewRepresentable {
                 )
                 
                 // 히트맵 반경 내에 있고 가장 가까운 지역 찾기
-                if distance < 0.1 && distance < minDistance { // 0.1도 = 약 11km
+                if distance < 0.5 && distance < minDistance { // 0.5도 = 약 55km로 확대
                     minDistance = distance
                     nearestArea = riskAreas.first { $0.name == point.name }
                 }

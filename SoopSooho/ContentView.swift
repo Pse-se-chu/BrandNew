@@ -118,11 +118,14 @@ struct ContentView: View {
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("ShowFireRiskPopup"))) { notification in
-            print("[ContentView] 맵에서 Notification 수신됨")
+            print("🔔 [ContentView] 맵에서 Notification 수신됨!")
             if let area = notification.object as? FireRiskArea {
-                print("[ContentView] 맵에서 선택된 지역: \(area.name)")
+                print("✅ [ContentView] 맵에서 선택된 지역: \(area.name)")
                 selectedArea = area
                 showingPopup = true
+                print("🎯 [ContentView] 팝업 표시 상태: \(showingPopup)")
+            } else {
+                print("❌ [ContentView] Notification 객체가 FireRiskArea가 아님: \(String(describing: notification.object))")
             }
         }
     }

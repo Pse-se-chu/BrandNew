@@ -15,13 +15,14 @@ struct SoopSoohoApp: App {
 
     var body: some Scene {
         WindowGroup {
-            if showOnboarding {
-                OnboardingView {
-                    showOnboarding = false
-                }
-            } else {
+   
                 ContentView()
+                    .preferredColorScheme(.light) // 라이트 모드 고정
+                    .onAppear {
+                        // 가로 모드 고정 - iOS 16+ 호환
+                        AppDelegate.orientationLock = UIInterfaceOrientationMask.landscape
+                    }
             }
         }
     }
-}
+
