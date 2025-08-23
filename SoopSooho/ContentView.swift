@@ -15,29 +15,30 @@ struct ContentView: View {
     var body: some View {
         ZStack {
             VStack {
-                Text("숲 수호")
+                Text("Soop SooHo")
                     .font(.largeTitle)
                     .fontWeight(.bold)
                     .padding(.bottom, 10)
-                Text("경상북도의 산불 예상 지수를 확인하세요!")
+                Text("Check the wildfire risk index of Gyeongsangbuk-do!")
                     .font(.headline)
                     .foregroundStyle(Color.gray)
                     .padding(.bottom, 24)
                 
                 HStack(spacing: 35){
-                    // 실시간 산불 위험 지역 TOP5
+                    // Realtime Top 5 Risk Areas
                     ZStack{
                         Rectangle()
                             .frame(width: 281, height: 654)
                             .cornerRadius(16)
-                            .foregroundStyle(Color.customGray)
+//                            .foregroundStyle(Color.customGray)
+                            .foregroundColor(Color(hex: "E0E9C9"))
                         
                         VStack(alignment: .leading, spacing: 0) {
-                            // 헤더
+                            // Header
                             VStack(alignment: .leading, spacing: 8) {
                                 HStack {
                                    
-                                    Text("실시간 위험 지역")
+                                    Text("Realtime Risk Areas")
                                         .font(.title3)
                                         .fontWeight(.bold)
                                     Spacer()
@@ -46,7 +47,7 @@ struct ContentView: View {
                                     .font(.subheadline)
                                     .foregroundColor(.secondary)
                                 
-                                Text("마지막 업데이트: \(formatTime(Date()))")
+                                Text("Last update: \(formatTime(Date()))")
                                     .font(.caption2)
                                     .foregroundColor(.secondary)
                             }
@@ -54,9 +55,9 @@ struct ContentView: View {
                             .padding(.top, 16)
                             .padding(.bottom, 12)
                             
-                            // 위험 지역 리스트
+                            // Risk area list
                             ScrollView {
-                                LazyVStack(spacing: 8) {
+                                LazyVStack(spacing: 16) {
                                     ForEach(Array(viewModel.topRiskAreas.enumerated()), id: \.element.id) { index, area in
                                         FireRiskCard(
                                             area: area, 
@@ -86,7 +87,7 @@ struct ContentView: View {
                
             }.padding(.top, 24)
             
-            // 팝업
+            // PopUp
             if showingPopup, let area = selectedArea {
                 FireSimulationPopup(area: area, isPresented: $showingPopup)
             }
@@ -109,7 +110,7 @@ struct FireRiskCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack {
-                // 순위
+                // Rank
                 ZStack {
                     Circle()
                         .fill(getRankColor())
@@ -131,7 +132,7 @@ struct FireRiskCard: View {
                 Spacer()
             }
             
-            // 상세 정보
+            // Details
             VStack(alignment: .leading, spacing: 3) {
                 HStack(spacing: 8) {
                     HStack(spacing: 2) {
