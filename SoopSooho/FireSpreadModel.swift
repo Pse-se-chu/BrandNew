@@ -8,6 +8,37 @@
 import Foundation
 import SwiftUI
 
+// 화재 이력 데이터 모델
+struct FireHistory {
+    let fireDate: Date
+    let burnedArea: Double // 연소 면적 (ha)
+    let suppressionDate: Date? // 진화 완료일 (nil이면 미완료)
+    let fireIntensity: FireIntensity
+    let location: FireLocation
+}
+
+enum FireIntensity: String, CaseIterable {
+    case low = "약함"
+    case moderate = "보통"
+    case high = "강함"
+    case extreme = "극강"
+    
+    var riskMultiplier: Double {
+        switch self {
+        case .low: return 1.2
+        case .moderate: return 1.5
+        case .high: return 2.0
+        case .extreme: return 3.0
+        }
+    }
+}
+
+struct FireLocation {
+    let latitude: Double
+    let longitude: Double
+    let radius: Double // 영향 반경 (km)
+}
+
 // 지리 정보 모델
 struct GeographicData {
     let elevation: Int // 고도 (m)
@@ -47,11 +78,53 @@ enum VegetationType: String, CaseIterable {
 
 // 토양 데이터 모델
 struct SoilData {
-    let moistureContent: Double // 토양 수분 함량 (%)
+    let moistureContent: Double // 표면 토양 수분 함량 (%)
+    let deepSoilMoisture: Double // 심층 토양 수분 함량 (20-50cm 깊이, %)
     let organicMatter: Double // 유기물 함량 (%)
     let soilType: SoilType
     let depth: Double // 유기물층 깊이 (cm)
     let zombieFireRisk: ZombieFireRisk
+    let recentFireHistory: [FireHistory] // 최근 화재 이력
+    
+    // ZFRI 계산 (Zombie Fire Risk Index)
+    var zfriScore: Double {
+        let deepSoilDeficit = 1.0 - (deepSoilMoisture / 100.0) // 심층 토양 건조도
+        let organicFactor = min(organicMatter / 100.0, 1.0) // 유기물 함량 비율 (최대 1.0)
+        let burnHistoryWeight = calculateBurnHistoryWeight() // 화재 이력 가중치
+        
+        return deepSoilDeficit * organicFactor * burnHistoryWeight
+    }
+    
+    // 최근 화재 이력 가중치 계산
+    private func calculateBurnHistoryWeight() -> Double {
+        let currentDate = Date()
+        let oneMonthAgo = Calendar.current.date(byAdding: .month, value: -1, to: currentDate) ?? currentDate
+        
+        // 최근 1개월 내 화재 이력 필터링
+        let recentFires = recentFireHistory.filter { fire in
+            fire.fireDate >= oneMonthAgo
+        }
+        
+        if recentFires.isEmpty {
+            return 1.0 // 기본 가중치
+        }
+        
+        // 화재 강도와 진화 여부에 따른 가중치 계산
+        var totalWeight = 1.0
+        
+        for fire in recentFires {
+            let intensityMultiplier = fire.fireIntensity.riskMultiplier
+            let suppressionFactor = fire.suppressionDate == nil ? 2.0 : 1.3 // 미진화시 더 높은 가중치
+            
+            // 화재 발생일로부터 경과 시간 (최근일수록 높은 가중치)
+            let daysSinceFire = Calendar.current.dateComponents([.day], from: fire.fireDate, to: currentDate).day ?? 30
+            let timeFactor = max(0.1, 1.0 - (Double(daysSinceFire) / 30.0)) // 30일에 걸쳐 감소
+            
+            totalWeight += (intensityMultiplier * suppressionFactor * timeFactor)
+        }
+        
+        return min(totalWeight, 5.0) // 최대 5배까지 가중
+    }
 }
 
 enum SoilType: String, CaseIterable {

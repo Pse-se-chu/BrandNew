@@ -57,10 +57,20 @@ class FireRiskViewModel: ObservableObject {
                     ),
                     soilData: SoilData(
                         moistureContent: 8.5,
+                        deepSoilMoisture: 5.2, // 심층 토양이 더 건조
                         organicMatter: 15.2,
                         soilType: .humus,
                         depth: 12.5,
-                        zombieFireRisk: .veryHigh
+                        zombieFireRisk: .veryHigh,
+                        recentFireHistory: [
+                            FireHistory(
+                                fireDate: Calendar.current.date(byAdding: .day, value: -15, to: Date()) ?? Date(),
+                                burnedArea: 2.3,
+                                suppressionDate: nil, // 미완전 진화
+                                fireIntensity: .high,
+                                location: FireLocation(latitude: 36.9, longitude: 129.4, radius: 0.5)
+                            )
+                        ]
                     ),
                     lastUpdated: Date()
                 )
@@ -92,10 +102,12 @@ class FireRiskViewModel: ObservableObject {
                     ),
                     soilData: SoilData(
                         moistureContent: 12.3,
+                        deepSoilMoisture: 8.7,
                         organicMatter: 11.8,
                         soilType: .loam,
                         depth: 8.2,
-                        zombieFireRisk: .high
+                        zombieFireRisk: .high,
+                        recentFireHistory: [] // 최근 화재 이력 없음
                     ),
                     lastUpdated: Date()
                 )
@@ -127,10 +139,20 @@ class FireRiskViewModel: ObservableObject {
                     ),
                     soilData: SoilData(
                         moistureContent: 9.8,
+                        deepSoilMoisture: 6.1, // 이탄토라 심층도 매우 건조
                         organicMatter: 18.5,
                         soilType: .peat,
                         depth: 15.7,
-                        zombieFireRisk: .veryHigh
+                        zombieFireRisk: .veryHigh,
+                        recentFireHistory: [
+                            FireHistory(
+                                fireDate: Calendar.current.date(byAdding: .day, value: -8, to: Date()) ?? Date(),
+                                burnedArea: 1.7,
+                                suppressionDate: Calendar.current.date(byAdding: .day, value: -5, to: Date()),
+                                fireIntensity: .moderate,
+                                location: FireLocation(latitude: 36.8, longitude: 128.9, radius: 0.3)
+                            )
+                        ]
                     ),
                     lastUpdated: Date()
                 )
@@ -162,10 +184,12 @@ class FireRiskViewModel: ObservableObject {
                     ),
                     soilData: SoilData(
                         moistureContent: 18.7,
+                        deepSoilMoisture: 15.3,
                         organicMatter: 8.9,
                         soilType: .clay,
                         depth: 5.4,
-                        zombieFireRisk: .medium
+                        zombieFireRisk: .medium,
+                        recentFireHistory: [] // 최근 화재 이력 없음
                     ),
                     lastUpdated: Date()
                 )
@@ -197,10 +221,12 @@ class FireRiskViewModel: ObservableObject {
                     ),
                     soilData: SoilData(
                         moistureContent: 22.1,
+                        deepSoilMoisture: 19.8,
                         organicMatter: 6.7,
                         soilType: .sand,
                         depth: 4.2,
-                        zombieFireRisk: .low
+                        zombieFireRisk: .low,
+                        recentFireHistory: [] // 최근 화재 이력 없음
                     ),
                     lastUpdated: Date()
                 )

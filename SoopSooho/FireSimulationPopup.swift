@@ -281,47 +281,91 @@ struct FireSimulationPopup: View {
                 VStack(spacing: 12) {
                     HStack {
                         VStack(alignment: .leading, spacing: 8) {
-                            environmentDataCard("토양 수분", String(format: "%.1f%%", area.enhancedData.soilData.moistureContent), "drop")
-                            environmentDataCard("유기물 함량", String(format: "%.1f%%", area.enhancedData.soilData.organicMatter), "leaf.circle")
+                            environmentDataCard("표면 토양수분", String(format: "%.1f%%", area.enhancedData.soilData.moistureContent), "drop")
+                            environmentDataCard("심층 토양수분", String(format: "%.1f%%", area.enhancedData.soilData.deepSoilMoisture), "drop.fill")
                         }
                         
                         VStack(alignment: .leading, spacing: 8) {
-                            environmentDataCard("토양 유형", area.enhancedData.soilData.soilType.rawValue, "globe.asia.australia")
+                            environmentDataCard("유기물 함량", String(format: "%.1f%%", area.enhancedData.soilData.organicMatter), "leaf.circle")
                             environmentDataCard("유기물층 깊이", String(format: "%.1fcm", area.enhancedData.soilData.depth), "ruler")
                         }
                     }
                     
-                    // 좀비불 위험도 특별 표시
                     HStack {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("좀비불 위험도")
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-                            Text(area.enhancedData.soilData.zombieFireRisk.rawValue)
-                                .font(.title2)
-                                .fontWeight(.bold)
-                                .foregroundColor(area.enhancedData.soilData.zombieFireRisk.color)
+                        VStack(alignment: .leading, spacing: 8) {
+                            environmentDataCard("토양 유형", area.enhancedData.soilData.soilType.rawValue, "globe.asia.australia")
                         }
                         
-                        Spacer()
+                        VStack(alignment: .leading, spacing: 8) {
+                            if !area.enhancedData.soilData.recentFireHistory.isEmpty {
+                                environmentDataCard("최근 화재", "\(area.enhancedData.soilData.recentFireHistory.count)건", "flame.fill")
+                            } else {
+                                environmentDataCard("최근 화재", "없음", "checkmark.circle")
+                            }
+                        }
+                    }
+                    
+                    // 좀비불 위험도 특별 표시
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("좀비불 위험도 (ZFRI)")
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                Text(area.enhancedData.soilData.zombieFireRisk.rawValue)
+                                    .font(.title2)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(area.enhancedData.soilData.zombieFireRisk.color)
+                                Text("ZFRI: \(String(format: "%.3f", area.enhancedData.soilData.zfriScore))")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            
+                            Spacer()
+                            
+                            ZStack {
+                                Circle()
+                                    .stroke(Color.gray.opacity(0.3), lineWidth: 6)
+                                    .frame(width: 60, height: 60)
+                                
+                                Circle()
+                                    .trim(from: 0, to: min(area.enhancedData.soilData.zfriScore, 1.0))
+                                    .stroke(
+                                        area.enhancedData.soilData.zombieFireRisk.color,
+                                        style: StrokeStyle(lineWidth: 6, lineCap: .round)
+                                    )
+                                    .frame(width: 60, height: 60)
+                                    .rotationEffect(.degrees(-90))
+                                
+                                Image(systemName: "flame.circle")
+                                    .font(.title3)
+                                    .foregroundColor(area.enhancedData.soilData.zombieFireRisk.color)
+                            }
+                        }
                         
-                        ZStack {
-                            Circle()
-                                .stroke(Color.gray.opacity(0.3), lineWidth: 6)
-                                .frame(width: 60, height: 60)
-                            
-                            Circle()
-                                .trim(from: 0, to: area.enhancedData.soilData.zombieFireRisk.riskValue)
-                                .stroke(
-                                    area.enhancedData.soilData.zombieFireRisk.color,
-                                    style: StrokeStyle(lineWidth: 6, lineCap: .round)
-                                )
-                                .frame(width: 60, height: 60)
-                                .rotationEffect(.degrees(-90))
-                            
-                            Image(systemName: "flame.circle")
-                                .font(.title3)
-                                .foregroundColor(area.enhancedData.soilData.zombieFireRisk.color)
+                        // ZFRI 구성 요소 표시
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("ZFRI 구성 요소:")
+                                .font(.caption)
+                                .fontWeight(.medium)
+                            HStack {
+                                Text("• 심층토양건조도: \(String(format: "%.2f", 1.0 - (area.enhancedData.soilData.deepSoilMoisture / 100.0)))")
+                                    .font(.caption2)
+                                Spacer()
+                            }
+                            HStack {
+                                Text("• 유기물함량: \(String(format: "%.1f%%", area.enhancedData.soilData.organicMatter))")
+                                    .font(.caption2)
+                                Spacer()
+                            }
+                            if !area.enhancedData.soilData.recentFireHistory.isEmpty {
+                                HStack {
+                                    Text("• 최근화재이력: \(area.enhancedData.soilData.recentFireHistory.count)건")
+                                        .font(.caption2)
+                                        .foregroundColor(.red)
+                                    Spacer()
+                                }
+                            }
                         }
                     }
                     .padding(12)
@@ -603,13 +647,14 @@ struct FireSimulationPopup: View {
             ))
         }
         
-        // 좀비불 지점들 생성 (토양 조건에 따라)
-        let zombieRisk = area.enhancedData.soilData.zombieFireRisk.riskValue
-        let zombieCount = Int(zombieRisk * 6)
+        // 좀비불 지점들 생성 (ZFRI 기반)
+        let zfriScore = area.enhancedData.soilData.zfriScore
+        let zombieCount = Int(min(zfriScore * 8, 6)) // ZFRI 점수에 따라 최대 6개
         
         for i in 0..<zombieCount {
             let angle = Double.random(in: 0...(2 * .pi))
-            let distance = Double.random(in: 30...100)
+            // ZFRI가 높을수록 더 넓은 범위에 분포
+            let distance = Double.random(in: 30...(100 + zfriScore * 50))
             
             let x = 150 + cos(angle) * distance
             let y = 125 + sin(angle) * distance
@@ -618,7 +663,8 @@ struct FireSimulationPopup: View {
                 x: max(20, min(280, x)),
                 y: max(20, min(230, y)),
                 intensity: 0.0,
-                arrivalTime: Double(i) * 15 + 60, // 좀비불은 나중에 발생
+                // ZFRI가 높을수록 더 빨리 발생
+                arrivalTime: Double(i) * 12 + max(30, 90 - zfriScore * 60),
                 isZombieFire: true
             ))
         }
