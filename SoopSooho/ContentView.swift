@@ -91,6 +91,14 @@ struct ContentView: View {
                 FireSimulationPopup(area: area, isPresented: $showingPopup)
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("ShowFireRiskPopup"))) { notification in
+            print("[ContentView] 맵에서 Notification 수신됨")
+            if let area = notification.object as? FireRiskArea {
+                print("[ContentView] 맵에서 선택된 지역: \(area.name)")
+                selectedArea = area
+                showingPopup = true
+            }
+        }
     }
     
     private func formatTime(_ date: Date) -> String {

@@ -83,7 +83,6 @@ struct SoilData {
     let organicMatter: Double // 유기물 함량 (%)
     let soilType: SoilType
     let depth: Double // 유기물층 깊이 (cm)
-    let zombieFireRisk: ZombieFireRisk
     let recentFireHistory: [FireHistory] // 최근 화재 이력
     
     // ZFRI 계산 (Zombie Fire Risk Index)
@@ -93,6 +92,18 @@ struct SoilData {
         let burnHistoryWeight = calculateBurnHistoryWeight() // 화재 이력 가중치
         
         return deepSoilDeficit * organicFactor * burnHistoryWeight
+    }
+    
+    // ZFRI 점수 기반 위험도 분류
+    var zfriRiskLevel: ZombieFireRisk {
+        let score = zfriScore
+        switch score {
+        case 0.8...: return .veryHigh    // 0.8 이상 = 매우 높음
+        case 0.6..<0.8: return .high     // 0.6~0.8 = 높음
+        case 0.4..<0.6: return .medium   // 0.4~0.6 = 보통
+        case 0.2..<0.4: return .low      // 0.2~0.4 = 낮음
+        default: return .veryLow         // 0.2 미만 = 매우 낮음
+        }
     }
     
     // 최근 화재 이력 가중치 계산
@@ -194,28 +205,30 @@ enum WindDirection: String, CaseIterable {
     case northwest = "북서"
     
     var angle: Double {
+        // 화재 확산 방향 (바람이 부는 방향) - 화면 좌표계 기준
         switch self {
-        case .north: return 0
-        case .northeast: return 45
-        case .east: return 90
-        case .southeast: return 135
-        case .south: return 180
-        case .southwest: return 225
-        case .west: return 270
-        case .northwest: return 315
+        case .north: return 90     // 북풍 → 남쪽으로 확산 (아래쪽)
+        case .northeast: return 135 // 북동풍 → 남서쪽으로 확산
+        case .east: return 180     // 동풍 → 서쪽으로 확산 (왼쪽)
+        case .southeast: return 225 // 남동풍 → 북서쪽으로 확산
+        case .south: return 270    // 남풍 → 북쪽으로 확산 (위쪽)
+        case .southwest: return 315 // 남서풍 → 북동쪽으로 확산
+        case .west: return 0       // 서풍 → 동쪽으로 확산 (오른쪽)
+        case .northwest: return 45  // 북서풍 → 남동쪽으로 확산
         }
     }
     
     var symbol: String {
+        // 화재 확산 방향 화살표
         switch self {
-        case .north: return "↑"
-        case .northeast: return "↗"
-        case .east: return "→"
-        case .southeast: return "↘"
-        case .south: return "↓"
-        case .southwest: return "↙"
-        case .west: return "←"
-        case .northwest: return "↖"
+        case .north: return "↓"    // 북풍 → 남쪽(아래)으로 확산
+        case .northeast: return "↙" // 북동풍 → 남서쪽으로 확산
+        case .east: return "←"     // 동풍 → 서쪽(왼쪽)으로 확산
+        case .southeast: return "↖" // 남동풍 → 북서쪽으로 확산
+        case .south: return "↑"    // 남풍 → 북쪽(위)으로 확산
+        case .southwest: return "↗" // 남서풍 → 북동쪽으로 확산
+        case .west: return "→"     // 서풍 → 동쪽(오른쪽)으로 확산
+        case .northwest: return "↘" // 북서풍 → 남동쪽으로 확산
         }
     }
 }
@@ -244,7 +257,7 @@ struct EnhancedFireRiskArea {
     var overallRiskScore: Double {
         let weatherRisk = calculateWeatherRisk()
         let geographicRisk = calculateGeographicRisk()
-        let soilRisk = soilData.zombieFireRisk.riskValue
+        let soilRisk = soilData.zfriRiskLevel.riskValue // 계산된 ZFRI 위험도 사용
         
         return (weatherRisk * 0.4 + geographicRisk * 0.4 + soilRisk * 0.2)
     }

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUICore
 
 struct FireRiskArea {
     let id = UUID()
@@ -61,7 +62,6 @@ class FireRiskViewModel: ObservableObject {
                         organicMatter: 15.2,
                         soilType: .humus,
                         depth: 12.5,
-                        zombieFireRisk: .veryHigh,
                         recentFireHistory: [
                             FireHistory(
                                 fireDate: Calendar.current.date(byAdding: .day, value: -15, to: Date()) ?? Date(),
@@ -106,7 +106,6 @@ class FireRiskViewModel: ObservableObject {
                         organicMatter: 11.8,
                         soilType: .loam,
                         depth: 8.2,
-                        zombieFireRisk: .high,
                         recentFireHistory: [] // 최근 화재 이력 없음
                     ),
                     lastUpdated: Date()
@@ -143,7 +142,6 @@ class FireRiskViewModel: ObservableObject {
                         organicMatter: 12.1,
                         soilType: .loam,
                         depth: 8.5,
-                        zombieFireRisk: .medium,
                         recentFireHistory: [
                             FireHistory(
                                 fireDate: Calendar.current.date(byAdding: .day, value: -8, to: Date()) ?? Date(),
@@ -188,7 +186,6 @@ class FireRiskViewModel: ObservableObject {
                         organicMatter: 8.9,
                         soilType: .clay,
                         depth: 5.4,
-                        zombieFireRisk: .medium,
                         recentFireHistory: [] // 최근 화재 이력 없음
                     ),
                     lastUpdated: Date()
@@ -225,7 +222,6 @@ class FireRiskViewModel: ObservableObject {
                         organicMatter: 6.7,
                         soilType: .sand,
                         depth: 4.2,
-                        zombieFireRisk: .low,
                         recentFireHistory: [] // 최근 화재 이력 없음
                     ),
                     lastUpdated: Date()
@@ -234,13 +230,13 @@ class FireRiskViewModel: ObservableObject {
         ]
     }
     
-    func getRiskLevelColor(_ level: Int) -> String {
+    func getRiskLevelColor(_ level: Int) -> Color {
         switch level {
-        case 5: return "red"
-        case 4: return "orange"
-        case 3: return "yellow"
-        case 2: return "blue"
-        default: return "green"
+        case 5: return .red
+        case 4: return .orange
+        case 3: return .yellow
+        case 2: return .blue
+        default: return .green
         }
     }
     

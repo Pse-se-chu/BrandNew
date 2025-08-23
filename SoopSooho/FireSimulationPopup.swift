@@ -15,6 +15,7 @@ struct FireSimulationPopup: View {
     @State private var spreadPoints: [SpreadPoint] = []
     @State private var zombieFirePoints: [SpreadPoint] = []
     @State private var selectedTab = 0
+    @State private var riskScoreProgress: Double = 0.0 // 위험도 링 애니메이션용
     
     // FireRiskViewModel 인스턴스 생성
     private let viewModel = FireRiskViewModel()
@@ -57,6 +58,27 @@ struct FireSimulationPopup: View {
             .background(Color.white)
             .cornerRadius(16)
             .shadow(radius: 20)
+            .onAppear {
+                // 디버깅: 위험도 계산값 출력
+                let weatherRisk = area.enhancedData.calculateWeatherRisk()
+                let geographicRisk = area.enhancedData.calculateGeographicRisk()
+                let soilRisk = area.enhancedData.soilData.zfriRiskLevel.riskValue
+                let overallRisk = area.enhancedData.overallRiskScore
+                
+                print("=== 위험도 계산 ===")
+                print("Weather Risk: \(weatherRisk)")
+                print("Geographic Risk: \(geographicRisk)")
+                print("Soil Risk: \(soilRisk)")
+                print("Overall Risk: \(overallRisk)")
+                print("==================")
+                
+                // 위험도 링 애니메이션 시작 (약간의 지연 후)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    withAnimation(.easeInOut(duration: 2.0)) {
+                        riskScoreProgress = overallRisk
+                    }
+                }
+            }
         }
     }
 
@@ -151,19 +173,20 @@ struct FireSimulationPopup: View {
                                 .frame(width: 100, height: 100)
                             
                             Circle()
-                                .trim(from: 0, to: area.enhancedData.overallRiskScore)
+                                .trim(from: 0, to: riskScoreProgress)
                                 .stroke(
-                                    Color(viewModel.getRiskLevelColor(area.riskLevel)),
+                                    viewModel.getRiskLevelColor(area.riskLevel),
                                     style: StrokeStyle(lineWidth: 10, lineCap: .round)
                                 )
                                 .frame(width: 100, height: 100)
                                 .rotationEffect(.degrees(-90))
+                                .animation(.easeInOut(duration: 1.5), value: riskScoreProgress)
                             
                             VStack {
                                 Text("\(area.riskLevel)")
                                     .font(.title)
                                     .fontWeight(.bold)
-                                    .foregroundColor(Color(viewModel.getRiskLevelColor(area.riskLevel)))
+                                    .foregroundColor(viewModel.getRiskLevelColor(area.riskLevel))
                                 Text(String(format: "%.1f%%", area.enhancedData.overallRiskScore * 100))
                                     .font(.caption)
                                     .foregroundColor(.secondary)
@@ -173,7 +196,7 @@ struct FireSimulationPopup: View {
                         Text(viewModel.getRiskLevelText(area.riskLevel))
                             .font(.caption)
                             .fontWeight(.medium)
-                            .foregroundColor(Color(viewModel.getRiskLevelColor(area.riskLevel)))
+                            .foregroundColor(viewModel.getRiskLevelColor(area.riskLevel))
                     }
                     
                     // 기본 기상 정보
@@ -223,7 +246,7 @@ struct FireSimulationPopup: View {
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 12) {
                     riskFactorCard("기상 조건", value: area.enhancedData.calculateWeatherRisk() * 100, color: .orange)
                     riskFactorCard("지형 조건", value: area.enhancedData.calculateGeographicRisk() * 100, color: .green)
-                    riskFactorCard("토양 조건", value: area.enhancedData.soilData.zombieFireRisk.riskValue * 100, color: .brown)
+                    riskFactorCard("토양 조건", value: area.enhancedData.soilData.zfriRiskLevel.riskValue * 100, color: .brown)
                     riskFactorCard("가뭄 지수", value: area.enhancedData.weatherData.droughtIndex * 100, color: .red)
                 }
             }
@@ -312,10 +335,10 @@ struct FireSimulationPopup: View {
                                 Text("좀비불 위험도 (ZFRI)")
                                     .font(.subheadline)
                                     .fontWeight(.medium)
-                                Text(area.enhancedData.soilData.zombieFireRisk.rawValue)
+                                Text(area.enhancedData.soilData.zfriRiskLevel.rawValue)
                                     .font(.title2)
                                     .fontWeight(.bold)
-                                    .foregroundColor(area.enhancedData.soilData.zombieFireRisk.color)
+                                    .foregroundColor(area.enhancedData.soilData.zfriRiskLevel.color)
                                 Text("ZFRI: \(String(format: "%.3f", area.enhancedData.soilData.zfriScore))")
                                     .font(.caption)
                                     .foregroundColor(.secondary)
@@ -329,9 +352,9 @@ struct FireSimulationPopup: View {
                                     .frame(width: 60, height: 60)
                                 
                                 Circle()
-                                    .trim(from: 0, to: min(area.enhancedData.soilData.zombieFireRisk.riskValue, 1.0))
+                                    .trim(from: 0, to: min(area.enhancedData.soilData.zfriRiskLevel.riskValue, 1.0))
                                     .stroke(
-                                        area.enhancedData.soilData.zombieFireRisk.color,
+                                        area.enhancedData.soilData.zfriRiskLevel.color,
                                         style: StrokeStyle(lineWidth: 6, lineCap: .round)
                                     )
                                     .frame(width: 60, height: 60)
@@ -339,7 +362,7 @@ struct FireSimulationPopup: View {
                                 
                                 Image(systemName: "flame.circle")
                                     .font(.title3)
-                                    .foregroundColor(area.enhancedData.soilData.zombieFireRisk.color)
+                                    .foregroundColor(area.enhancedData.soilData.zfriRiskLevel.color)
                             }
                         }
                         
@@ -369,7 +392,7 @@ struct FireSimulationPopup: View {
                         }
                     }
                     .padding(12)
-                    .background(area.enhancedData.soilData.zombieFireRisk.color.opacity(0.1))
+                    .background(area.enhancedData.soilData.zfriRiskLevel.color.opacity(0.1))
                     .cornerRadius(8)
                 }
             }
@@ -630,19 +653,34 @@ struct FireSimulationPopup: View {
         // 풍향에 따른 확산 방향 계산
         let windAngle = windDirection.angle * .pi / 180
         
+        // 풍속에 따른 확산 강도 (풍속이 클수록 더 멀리, 더 빠르게 확산)
+        let windSpeedFactor = min(windSpeed / 5.0, 3.0) // 최대 3배까지 증가
+        
         // 일반 확산 지점들 생성
         for i in 0..<12 {
-            let angle = windAngle + Double.random(in: -0.5...0.5)
-            let distance = Double(i) * 15 + Double.random(in: -10...10)
+            // 주 확산 방향 (풍향 기준)
+            let mainAngle = windAngle
+            // 부차적 확산 (풍향에서 ±10도 범위로 더 집중)
+            let angleVariation = Double.random(in: -0.175...0.175) // ±10도
+            let finalAngle = mainAngle + angleVariation
             
-            let x = 150 + cos(angle) * distance * (windSpeed / 10.0)
-            let y = 125 + sin(angle) * distance * (1 + slope / 45.0)
+            // 거리 계산 (풍속과 시간에 비례)
+            let baseDistance = Double(i) * 12 // 기본 거리
+            let windInfluence = baseDistance * windSpeedFactor // 풍속 영향
+            let randomVariation = Double.random(in: -8...8) // 랜덤 변화
+            let totalDistance = windInfluence + randomVariation
+            
+            // 경사도 영향 (상향 경사에서는 확산 가속)
+            let slopeMultiplier = 1.0 + (slope / 90.0) // 경사도에 비례
+            
+            let x = 150 + cos(finalAngle) * totalDistance * slopeMultiplier
+            let y = 125 + sin(finalAngle) * totalDistance * slopeMultiplier
             
             spreadPoints.append(SpreadPoint(
                 x: max(20, min(280, x)),
                 y: max(20, min(230, y)),
                 intensity: 0.0,
-                arrivalTime: Double(i) * 5,
+                arrivalTime: Double(i) * (6.0 / windSpeedFactor), // 풍속이 클수록 빨리 도달
                 isZombieFire: false
             ))
         }
@@ -702,43 +740,43 @@ struct FireSimulationPopup: View {
     }
 }
 
-#Preview {
-    FireSimulationPopup(
-        area: FireRiskArea(
-            name: "울진군 북면", 
-            riskLevel: 5, 
-            temperature: 32, 
-            humidity: 15, 
-            windSpeed: 8.5, 
-            lastUpdated: Date(),
-            enhancedData: EnhancedFireRiskArea(
-                name: "울진군 북면",
-                riskLevel: 5,
-                weatherData: WeatherData(
-                    windDirection: .southwest,
-                    windSpeed: 8.5,
-                    temperature: 32,
-                    humidity: 15,
-                    precipitation: 0.0,
-                    droughtIndex: 0.85
-                ),
-                geographicData: GeographicData(
-                    elevation: 450,
-                    slope: 25.0,
-                    aspect: "남서",
-                    vegetationType: .pine,
-                    fuelLoad: 35.2
-                ),
-                soilData: SoilData(
-                    moistureContent: 8.5,
-                    organicMatter: 15.2,
-                    soilType: .humus,
-                    depth: 12.5,
-                    zombieFireRisk: .veryHigh
-                ),
-                lastUpdated: Date()
-            )
-        ),
-        isPresented: .constant(true)
-    )
-}
+//#Preview {
+//    FireSimulationPopup(
+//        area: FireRiskArea(
+//            name: "울진군 북면", 
+//            riskLevel: 5, 
+//            temperature: 32, 
+//            humidity: 15, 
+//            windSpeed: 8.5, 
+//            lastUpdated: Date(),
+//            enhancedData: EnhancedFireRiskArea(
+//                name: "울진군 북면",
+//                riskLevel: 5,
+//                weatherData: WeatherData(
+//                    windDirection: .southwest,
+//                    windSpeed: 8.5,
+//                    temperature: 32,
+//                    humidity: 15,
+//                    precipitation: 0.0,
+//                    droughtIndex: 0.85
+//                ),
+//                geographicData: GeographicData(
+//                    elevation: 450,
+//                    slope: 25.0,
+//                    aspect: "남서",
+//                    vegetationType: .pine,
+//                    fuelLoad: 35.2
+//                ),
+//                soilData: SoilData(
+//                    moistureContent: 8.5,
+//                    organicMatter: 15.2,
+//                    soilType: .humus,
+//                    depth: 12.5,
+//                    zombieFireRisk: .veryHigh
+//                ),
+//                lastUpdated: Date()
+//            )
+//        ),
+//        isPresented: .constant(true)
+//    )
+//}
