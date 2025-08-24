@@ -94,10 +94,10 @@ struct ContentView: View {
                                 }
                                 .padding(.trailing, 12)
                                 
-                                Image("Gom1")
+                                Image("Icon1")
                                     .resizable()
-                                    .frame(width: 80, height: 120)
-                                    .aspectRatio(contentMode: .fit)
+                                    .scaledToFit()
+                                    .frame(width: 80)
                                     .padding(.trailing, 16)
                             }
                         }
@@ -144,7 +144,7 @@ struct FireRiskCard: View {
     let onTap: () -> Void
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack {
                 // Rank
                 ZStack {
@@ -162,12 +162,74 @@ struct FireRiskCard: View {
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundColor(.primary)
                         .lineLimit(1)
+                    
+                    // Total risk score display
+                    Text("Risk: \(String(format: "%.1f", area.calculationResult.totalRisk)) pts")
+                        .font(.caption2)
+                        .foregroundColor(viewModel.getRiskLevelColor(area.riskLevel))
+                        .fontWeight(.medium)
                 }
                 
                 Spacer()
             }
             
-            // Details
+            // 3개 레이어 점수만 표시
+            HStack(spacing: 12) {
+                // Layer 1: KFS
+                VStack(alignment: .leading, spacing: 1) {
+                    HStack(spacing: 2) {
+                        Image(systemName: "cloud.sun")
+                            .font(.system(size: 8))
+                            .foregroundColor(.orange)
+                        Text("KFS")
+                            .font(.system(size: 8))
+                            .fontWeight(.medium)
+                    }
+                    Text("\(String(format: "%.0f", area.calculationResult.kfsRisk))")
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundColor(.orange)
+                }
+                
+                // Layer 2: Human Activity
+                VStack(alignment: .leading, spacing: 1) {
+                    HStack(spacing: 2) {
+                        Image(systemName: "person.2")
+                            .font(.system(size: 8))
+                            .foregroundColor(.purple)
+                        Text("Human")
+                            .font(.system(size: 8))
+                            .fontWeight(.medium)
+                    }
+                    Text("\(String(format: "%.0f", area.calculationResult.humanRisk))")
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundColor(.purple)
+                }
+                
+                // Layer 3: Forest+NDWI
+                VStack(alignment: .leading, spacing: 1) {
+                    HStack(spacing: 2) {
+                        Image(systemName: "leaf")
+                            .font(.system(size: 8))
+                            .foregroundColor(.green)
+                        Text("Forest")
+                            .font(.system(size: 8))
+                            .fontWeight(.medium)
+                    }
+                    Text("\(String(format: "%.0f", area.calculationResult.forestRisk))")
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundColor(.green)
+                }
+                
+                Spacer()
+            }
+            .padding(.vertical, 4)
+            .padding(.horizontal, 6)
+            .background(Color.gray.opacity(0.1))
+            .cornerRadius(4)
+            
+
+            
+            // 기존 기상 정보
             VStack(alignment: .leading, spacing: 3) {
                 HStack(spacing: 8) {
                     HStack(spacing: 2) {
@@ -211,10 +273,10 @@ struct FireRiskCard: View {
             }
             .foregroundColor(.secondary)
         }
-        .padding(8)
+        .padding(10)
         .background(Color.white.opacity(0.9))
-        .cornerRadius(6)
-        .shadow(color: .black.opacity(0.05), radius: 1, x: 0, y: 1)
+        .cornerRadius(8)
+        .shadow(color: .black.opacity(0.08), radius: 2, x: 0, y: 1)
         .onTapGesture {
             onTap()
         }

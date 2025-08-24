@@ -182,100 +182,160 @@ struct FireSimulationPopup: View {
 
     private var currentRiskView: some View {
         VStack(alignment: .leading, spacing: 16) {
-            // 종합 위험도
+            // 3-Layer 종합 위험도
             VStack(alignment: .leading, spacing: 12) {
-                Text("Overall Risk Index")
+                Text("3-Layer Fire Risk Analysis")
                     .font(.headline)
                     .fontWeight(.semibold)
                 
                 HStack(spacing: 20) {
-                    // 위험도 게이지
+                    // 종합 위험도 게이지
                     VStack {
                         ZStack {
                             Circle()
-                                .stroke(Color.gray.opacity(0.3), lineWidth: 10)
-                                .frame(width: 100, height: 100)
+                                .stroke(Color.gray.opacity(0.3), lineWidth: 12)
+                                .frame(width: 120, height: 120)
                             
                             Circle()
-                                .trim(from: 0, to: riskScoreProgress)
+                                .trim(from: 0, to: area.calculationResult.totalRisk / 100)
                                 .stroke(
                                     viewModel.getRiskLevelColor(area.riskLevel),
-                                    style: StrokeStyle(lineWidth: 10, lineCap: .round)
+                                    style: StrokeStyle(lineWidth: 12, lineCap: .round)
                                 )
-                                .frame(width: 100, height: 100)
+                                .frame(width: 120, height: 120)
                                 .rotationEffect(.degrees(-90))
-                                .animation(.easeInOut(duration: 1.5), value: riskScoreProgress)
+                                .animation(.easeInOut(duration: 1.5), value: area.calculationResult.totalRisk)
                             
                             VStack {
-                                Text("\(area.riskLevel)")
-                                    .font(.title)
+                                Text(String(format: "%.1f", area.calculationResult.totalRisk))
+                                    .font(.title2)
                                     .fontWeight(.bold)
                                     .foregroundColor(viewModel.getRiskLevelColor(area.riskLevel))
-                                Text(String(format: "%.1f%%", area.enhancedData.overallRiskScore * 100))
-                                    .font(.caption)
+                                Text("Total Score")
+                                    .font(.caption2)
                                     .foregroundColor(.secondary)
                             }
                         }
                         
-                        Text(viewModel.getRiskLevelText(area.riskLevel))
+                        Text(area.calculationResult.riskLevel)
                             .font(.caption)
                             .fontWeight(.medium)
                             .foregroundColor(viewModel.getRiskLevelColor(area.riskLevel))
                     }
                     
-                    // 기본 기상 정보
-                    VStack(alignment: .leading, spacing: 8) {
+                    // 3-Layer 상세 점수
+                    VStack(alignment: .leading, spacing: 12) {
+                        // Layer 1: KFS Index
                         HStack {
-                            Image(systemName: "thermometer")
-                                .foregroundColor(.red)
-                            Text("Temperature: \(area.temperature)°C")
-                                .font(.subheadline)
+                            VStack(alignment: .leading, spacing: 2) {
+                                HStack {
+                                    Image(systemName: "cloud.sun.fill")
+                                        .foregroundColor(.orange)
+                                    Text("Layer 1: KFS Index")
+                                        .font(.subheadline)
+                                        .fontWeight(.medium)
+                                }
+                                Text("\(String(format: "%.1f", area.calculationResult.kfsRisk)) pts (Weight 40%)")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            Spacer()
+                            Text(String(format: "%.0f", area.calculationResult.kfsRisk))
+                                .font(.title3)
+                                .fontWeight(.bold)
+                                .foregroundColor(.orange)
                         }
-                                                
+                        
+                        // Layer 2: Human Activity
                         HStack {
-                            Image(systemName: "drop")
-                                .foregroundColor(.blue)
-                            Text("Humidity: \(area.humidity)%")
-                                .font(.subheadline)
+                            VStack(alignment: .leading, spacing: 2) {
+                                HStack {
+                                    Image(systemName: "person.2.fill")
+                                        .foregroundColor(.purple)
+                                    Text("Layer 2: Human Activity")
+                                        .font(.subheadline)
+                                        .fontWeight(.medium)
+                                }
+                                Text("\(String(format: "%.1f", area.calculationResult.humanRisk)) pts (Weight 30%)")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            Spacer()
+                            Text(String(format: "%.0f", area.calculationResult.humanRisk))
+                                .font(.title3)
+                                .fontWeight(.bold)
+                                .foregroundColor(.purple)
                         }
-                                                
+                        
+                        // Layer 3: Forest+NDWI
                         HStack {
-                            Image(systemName: "wind")
-                                .foregroundColor(.gray)
-                            Text("Wind Speed: \(String(format: "%.1f", area.windSpeed)) m/s")
-                                .font(.subheadline)
-                        }
-                                                
-                        HStack {
-                            Image(systemName: "location")
+                            VStack(alignment: .leading, spacing: 2) {
+                                HStack {
+                                    Image(systemName: "leaf.fill")
+                                        .foregroundColor(.green)
+                                    Text("Layer 3: Forest+NDWI")
+                                        .font(.subheadline)
+                                        .fontWeight(.medium)
+                                }
+                                Text("\(String(format: "%.1f", area.calculationResult.forestRisk)) pts (Weight 30%)")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                Text("NDWI: \(String(format: "%.3f", area.calculationResult.ndwiValue)) (\(viewModel.getNDWIDescription(area.calculationResult.ndwiValue)))")
+                                    .font(.caption2)
+                                    .foregroundColor(.blue)
+                            }
+                            Spacer()
+                            Text(String(format: "%.0f", area.calculationResult.forestRisk))
+                                .font(.title3)
+                                .fontWeight(.bold)
                                 .foregroundColor(.green)
-                            Text("Wind Direction: \(area.enhancedData.weatherData.windDirection.rawValue) \(area.enhancedData.weatherData.windDirection.symbol)")
-                                .font(.subheadline)
                         }
                     }
-                    
-                    Spacer()
                 }
             }
             .padding(16)
-//            .background(Color.gray.opacity(0.1))
             .background(Color(hex: "E0E9C9"))
             .cornerRadius(12)
             
-            // 위험 요소 분석
+
+            
+            // 기본 기상 정보
             VStack(alignment: .leading, spacing: 12) {
-                Text("Risk Factor Analysis")
+                Text("Current Weather Conditions")
                     .font(.headline)
                     .fontWeight(.semibold)
                 
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 12) {
-                    riskFactorCard("Weather Conditions", value: area.enhancedData.calculateWeatherRisk() * 100, color: .orange)
-                    riskFactorCard("Geographic Conditions", value: area.enhancedData.calculateGeographicRisk() * 100, color: .green)
-                    riskFactorCard("Soil Conditions", value: area.enhancedData.soilData.zfriRiskLevel.riskValue * 100, color: .brown)
-                    riskFactorCard("Drought Index", value: area.enhancedData.weatherData.droughtIndex * 100, color: .red)
+                    weatherInfoCard("Temperature", value: "\(area.temperature)°C", icon: "thermometer", color: .red)
+                    weatherInfoCard("Humidity", value: "\(area.humidity)%", icon: "drop", color: .blue)
+                    weatherInfoCard("Wind Speed", value: String(format: "%.1f m/s", area.windSpeed), icon: "wind", color: .gray)
+                    weatherInfoCard("Wind Direction", value: area.enhancedData.weatherData.windDirection.rawValue, icon: "location", color: .green)
                 }
             }
+            .padding(16)
+            .background(Color.gray.opacity(0.1))
+            .cornerRadius(12)
         }
+    }
+    
+    // 기상 정보 카드 헬퍼 함수
+    private func weatherInfoCard(_ title: String, value: String, icon: String, color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Image(systemName: icon)
+                    .foregroundColor(color)
+                Text(title)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Spacer()
+            }
+            Text(value)
+                .font(.subheadline)
+                .fontWeight(.medium)
+        }
+        .padding(8)
+        .background(Color.white)
+        .cornerRadius(6)
     }
     
     private func riskFactorCard(_ title: String, value: Double, color: Color) -> some View {
@@ -765,5 +825,18 @@ struct FireSimulationPopup: View {
                 zombieFirePoints[i].intensity = min(0.8, timeSinceArrival / 45.0)
             }
         }
+    }
+    
+    // Date formatting helper functions
+    private func formatFireDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM dd"
+        return formatter.string(from: date)
+    }
+    
+    private func daysAgo(from date: Date) -> Int {
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.day], from: date, to: Date())
+        return components.day ?? 0
     }
 }
